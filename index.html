@@ -20,154 +20,113 @@ body {
   background: #f3f6fb;
   color: #2c3e50;
   margin: 0;
-  padding: 20px;
+  padding: 0;
 }
 
 .container {
-  max-width: 1100px;
-  margin: auto;
+  max-width: 1200px;
+  margin: 30px auto;
   background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  overflow: hidden;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Tablo */
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 th, td {
-  border: 1px solid #ddd;
+  border: 1px solid #dfe6f0;
+  padding: 8px;
   text-align: center;
-  vertical-align: top;
-  padding: 10px;
+  font-size: 14px;
 }
 
-/* --- Başlık Satırı --- */
-th {
+thead th {
   background: #4a90e2;
   color: white;
-  font-weight: bold;
   font-size: 15px;
 }
 
-/* --- Oyuncu İsimleri --- */
+/* Oyuncu isim inputları */
 .oyuncu-isim {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: white;
-  font-weight: 600;
-  font-size: 15px;
-  text-align: center;
   width: 100%;
-}
-.oyuncu-isim:focus {
-  color: white;
-  background: transparent;
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid #cfd8e3;
+  text-align: center;
 }
 
-/* --- Oyuncu Hücreleri --- */
+/* Her oyuncu hücresi */
 .player-cell {
-  background: #f9f9f9;
-  border-radius: 6px;
+  vertical-align: top;
   padding: 6px;
 }
 
-/* --- Açma Durumu Alanı --- */
-.kategori {
-  border: 1px solid #eee;
-  background: #fff;
-  margin-bottom: 6px;
-  border-radius: 6px;
-  padding: 4px;
-}
-.kategori h4 {
-  margin: 4px 0;
-  color: #4a90e2;
+/* Başlıklar */
+.player-cell h4 {
+  margin: 4px 0 6px;
   font-size: 13px;
-}
-.secenek {
-  display: inline-flex;
-  align-items: stretch;
-  justify-content: center;
-  vertical-align: middle;
-
-  min-height: 28px;        /* sabit yükseklik */
-  padding: 4px 12px;       /* metin çevresinde denge */
-  box-sizing: border-box;  /* padding'i yüksekliğe dahil et */
-  
-  background: #4a90e2;
-  color: white;
-  border-radius: 6px;
-  margin: 2px;
-  cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
-  line-height: normal;     /* fontun dikey hizasını doğal bırak */
-  transition: background 0.2s;
+  color: #34495e;
 }
 
-.secenek:hover {
-  background: #357abd;
-}
-.secenek.aktif {
-  background: #2ecc71;
-}
-
-/* --- Kalan Girişi (tıklayınca açılacak input için stil) --- */
-.kalan-input {
-  width: 50px;
-  text-align: center;
-  font-weight: bold;
-  color: white;
-  background: #4a90e2;
-  border: none;
-  outline: none;
+/* Kategori butonları */
+.secenek {
+  background: #ecf3ff;
   border-radius: 6px;
-  font-size: 13px;
-}
-
-/* --- Cezalar Alanı --- */
-.ceza-satiri {
+  padding: 5px 6px;
   margin: 4px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  cursor: pointer;
   font-size: 13px;
+  border: 1px solid #d0ddf5;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
-.ceza-satiri button {
-  width: 24px;
-  height: 24px;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-.ceza-satiri .azalt { background: #e74c3c; }
-.ceza-satiri .artir { background: #2ecc71; }
-.ceza-satiri span {
-  font-weight: bold;
-  color: #2c3e50;
-}
-/* --- Genel buton --- */
-.btn {
-  background: #e74c3c;
-  color: #fff;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-  margin: 16px auto;
-  display: block;
-}
-.btn:hover { opacity: .9; }
 
-/* --- Masa Sayısı Butonu --- */
+.secenek.aktif {
+  background: #4a90e2;
+  color: white;
+  border-color: #4a90e2;
+}
+
+/* Kalan için input */
+.kalan-input {
+  width: 100%;
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid #cfd8e3;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+/* Bitti alt seçenekleri */
+.bitti-ekstra {
+  display: none;
+  margin-top: 4px;
+}
+
+.bitti-ekstra span {
+  display: inline-block;
+  padding: 3px 8px;
+  margin: 2px 2px;
+  border-radius: 999px;
+  background: #f1f5ff;
+  border: 1px solid #d0ddf5;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.bitti-ekstra span.aktif {
+  background: #2ecc71;
+  color: white;
+  border-color: #27ae60;
+}
+
+/* Masa butonu */
 .masa-btn {
   display: inline-block;
   background: #4a90e2;
@@ -181,7 +140,59 @@ th {
 .masa-btn:hover { background: #357abd; }
 .masa-btn.aktif { background: #2ecc71; }
 
-/* --- Toplam Puanlar Satırı --- */
+/* Ceza satırı */
+.ceza-satiri {
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+}
+
+.ceza-satiri div {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  background: #f7f9ff;
+  border-radius: 999px;
+  padding: 2px 6px;
+}
+
+.ceza-satiri button {
+  margin-left: 4px;
+  border: none;
+  background: #e0e7ff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ceza-satiri button:hover {
+  background: #c7d2fe;
+}
+
+/* Genel butonlar */
+.btn {
+  display: inline-block;
+  margin: 10px 4px 0 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #4a90e2;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.btn:hover {
+  background: #357abd;
+}
+
+/* Toplam puanlar satırı */
 tfoot td {
   background: #eef4ff;
   font-weight: bold;
@@ -194,43 +205,41 @@ tfoot td:first-child {
   color: white;
 }
 
-/* --- Yedekleme butonları --- */
+/* Yedekleme butonları */
 .backup-buttons {
   display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 10px 0;
+  gap: 8px;
+  margin-bottom: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
 .backup-btn {
-  background: #3498db;
+  background: #4a90e2;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
+  font-size: 13px;
   font-weight: 600;
-  transition: background 0.2s;
-}
-.backup-btn:hover {
-  background: #2980b9;
 }
 .backup-btn.export {
   background: #2ecc71;
 }
-.backup-btn.export:hover {
-  background: #27ae60;
+.backup-btn:hover {
+  opacity: 0.9;
 }
+
 </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- Yedekleme butonları -->
   <div class="backup-buttons">
-    <button class="backup-btn export" id="btnExport">Yedek Al</button>
-    <button class="backup-btn" id="btnImport">Yedek Yükle</button>
+    <button class="backup-btn export" id="btnExport">Yedek Al (Dosya)</button>
+    <button class="backup-btn" id="btnImport">Yedek Yükle (Dosya)</button>
+    <input type="file" id="backupFileInput" accept=".txt,.json" style="display:none">
   </div>
-
   <table>
     <!-- Oyuncu İsimleri -->
     <thead>
@@ -256,23 +265,32 @@ tfoot td:first-child {
             <div class="secenek kalan">Kalan</div>
             <div class="secenek">Bitti</div>
           </div>
-          <div class="kategori">
-            <h4>Cezalar</h4>
-            <div class="masa-btn">Masa Sayısı</div>
-            <div class="ceza-satiri">İşlek:
-              <button class="azalt">-</button>
+
+          <div class="bitti-ekstra">
+            <h4>Ekstra</h4>
+            <span class="okey">Okey</span>
+            <span class="elden">Elden</span>
+          </div>
+
+          <div class="masa-satiri">
+            <span class="masa-btn">Masa</span>
+          </div>
+
+          <div class="ceza-satiri">
+            <div>+5:
+              <button class="ceza-eksi">-</button>
               <span>0</span>
-              <button class="artir">+</button>
+              <button class="ceza-arti">+</button>
             </div>
-            <div class="ceza-satiri">Hatalı Açma:
-              <button class="azalt">-</button>
+            <div>+10:
+              <button class="ceza-eksi">-</button>
               <span>0</span>
-              <button class="artir">+</button>
+              <button class="ceza-arti">+</button>
             </div>
-            <div class="ceza-satiri">Okey Kaptırma:
-              <button class="azalt">-</button>
+            <div>+20:
+              <button class="ceza-eksi">-</button>
               <span>0</span>
-              <button class="artir">+</button>
+              <button class="ceza-arti">+</button>
             </div>
           </div>
         </td>
@@ -285,17 +303,32 @@ tfoot td:first-child {
             <div class="secenek kalan">Kalan</div>
             <div class="secenek">Bitti</div>
           </div>
-          <div class="kategori">
-            <h4>Cezalar</h4>
-            <div class="masa-btn">Masa Sayısı</div>
-            <div class="ceza-satiri">İşlek:
-              <button class="azalt">-</button><span>0</span><button class="artir">+</button>
+
+          <div class="bitti-ekstra">
+            <h4>Ekstra</h4>
+            <span class="okey">Okey</span>
+            <span class="elden">Elden</span>
+          </div>
+
+          <div class="masa-satiri">
+            <span class="masa-btn">Masa</span>
+          </div>
+
+          <div class="ceza-satiri">
+            <div>+5:
+              <button class="ceza-eksi">-</button>
+              <span>0</span>
+              <button class="ceza-arti">+</button>
             </div>
-            <div class="ceza-satiri">Hatalı Açma:
-              <button class="azalt">-</button><span>0</span><button class="artir">+</button>
+            <div>+10:
+              <button class="ceza-eksi">-</button>
+              <span>0</span>
+              <button class="ceza-arti">+</button>
             </div>
-            <div class="ceza-satiri">Okey Kaptırma:
-              <button class="azalt">-</button><span>0</span><button class="artir">+</button>
+            <div>+20:
+              <button class="ceza-eksi">-</button>
+              <span>0</span>
+              <button class="ceza-arti">+</button>
             </div>
           </div>
         </td>
@@ -308,17 +341,32 @@ tfoot td:first-child {
             <div class="secenek kalan">Kalan</div>
             <div class="secenek">Bitti</div>
           </div>
-          <div class="kategori">
-            <h4>Cezalar</h4>
-            <div class="masa-btn">Masa Sayısı</div>
-            <div class="ceza-satiri">İşlek:
-              <button class="azalt">-</button><span>0</span><button class="artir">+</button>
+
+          <div class="bitti-ekstra">
+            <h4>Ekstra</h4>
+            <span class="okey">Okey</span>
+            <span class="elden">Elden</span>
+          </div>
+
+          <div class="masa-satiri">
+            <span class="masa-btn">Masa</span>
+          </div>
+
+          <div class="ceza-satiri">
+            <div>+5:
+              <button class="ceza-eksi">-</button>
+              <span>0</span>
+              <button class="ceza-arti">+</button>
             </div>
-            <div class="ceza-satiri">Hatalı Açma:
-              <button class="azalt">-</button><span>0</span><button class="artir">+</button>
+            <div>+10:
+              <button class="ceza-eksi">-</button>
+              <span>0</span>
+              <button class="ceza-arti">+</button>
             </div>
-            <div class="ceza-satiri">Okey Kaptırma:
-              <button class="azalt">-</button><span>0</span><button class="artir">+</button>
+            <div>+20:
+              <button class="ceza-eksi">-</button>
+              <span>0</span>
+              <button class="ceza-arti">+</button>
             </div>
           </div>
         </td>
@@ -331,39 +379,138 @@ tfoot td:first-child {
             <div class="secenek kalan">Kalan</div>
             <div class="secenek">Bitti</div>
           </div>
-          <div class="kategori">
-            <h4>Cezalar</h4>
-            <div class="masa-btn">Masa Sayısı</div>
-            <div class="ceza-satiri">İşlek:
-              <button class="azalt">-</button><span>0</span><button class="artir">+</button>
+
+          <div class="bitti-ekstra">
+            <h4>Ekstra</h4>
+            <span class="okey">Okey</span>
+            <span class="elden">Elden</span>
+          </div>
+
+          <div class="masa-satiri">
+            <span class="masa-btn">Masa</span>
+          </div>
+
+          <div class="ceza-satiri">
+            <div>+5:
+              <button class="ceza-eksi">-</button>
+              <span>0</span>
+              <button class="ceza-arti">+</button>
             </div>
-            <div class="ceza-satiri">Hatalı Açma:
-              <button class="azalt">-</button><span>0</span><button class="artir">+</button>
+            <div>+10:
+              <button class="ceza-eksi">-</button>
+              <span>0</span>
+              <button class="ceza-arti">+</button>
             </div>
-            <div class="ceza-satiri">Okey Kaptırma:
-              <button class="azalt">-</button><span>0</span><button class="artir">+</button>
+            <div>+20:
+              <button class="ceza-eksi">-</button>
+              <span>0</span>
+              <button class="ceza-arti">+</button>
             </div>
           </div>
         </td>
       </tr>
     </tbody>
 
-    <!-- 🔹 Toplam Puanlar Satırı -->
+    <!-- Toplam Puanlar Satırı -->
     <tfoot>
       <tr>
-        <td>Toplam</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <td>TOPLAM</td>
+        <td id="toplam1">0</td>
+        <td id="toplam2">0</td>
+        <td id="toplam3">0</td>
+        <td id="toplam4">0</td>
       </tr>
     </tfoot>
   </table>
+
+  <button class="btn" id="btnYeniEl">Yeni El Ekle</button>
+  <button class="btn" id="btnSilEl">Son Eli Sil</button>
   <button class="btn" id="btnYeniOyun">Yeni Oyun</button>
 </div>
 
 <script>
-// =========================  YEDEKLEME SİSTEMİ (URL Hash)  =========================
+/* --- Yardımcı: En yakın satırı bulma --- */
+function enYakinTR(eleman) {
+  while (eleman && eleman.tagName !== 'TR') {
+    eleman = eleman.parentElement;
+  }
+  return eleman;
+}
+
+/* --- El satırı oluşturma --- */
+function yeniElSatiri(eldekiIndex) {
+  const tr = document.createElement('tr');
+
+  const elNoTd = document.createElement('td');
+  elNoTd.innerHTML = '<b>' + eldekiIndex + '</b>';
+  tr.appendChild(elNoTd);
+
+  for (let i = 0; i < 4; i++) {
+    const td = document.createElement('td');
+    td.className = 'player-cell';
+    td.innerHTML = `
+      <div class="kategori">
+        <h4>Açma Durumu</h4>
+        <div class="secenek">Açamadı</div>
+        <div class="secenek kalan">Kalan</div>
+        <div class="secenek">Bitti</div>
+      </div>
+
+      <div class="bitti-ekstra">
+        <h4>Ekstra</h4>
+        <span class="okey">Okey</span>
+        <span class="elden">Elden</span>
+      </div>
+
+      <div class="masa-satiri">
+        <span class="masa-btn">Masa</span>
+      </div>
+
+      <div class="ceza-satiri">
+        <div>+5:
+          <button class="ceza-eksi">-</button>
+          <span>0</span>
+          <button class="ceza-arti">+</button>
+        </div>
+        <div>+10:
+          <button class="ceza-eksi">-</button>
+          <span>0</span>
+          <button class="ceza-arti">+</button>
+        </div>
+        <div>+20:
+          <button class="ceza-eksi">-</button>
+          <span>0</span>
+          <button class="ceza-arti">+</button>
+        </div>
+      </div>
+    `;
+    tr.appendChild(td);
+  }
+
+  return tr;
+}
+
+/* --- Yeni el ekle --- */
+function yeniElEkle() {
+  const tbody = document.querySelector('tbody');
+  const mevcutSatirlar = tbody.querySelectorAll('tr').length;
+  const yeniIndex = mevcutSatirlar + 1;
+  const tr = yeniElSatiri(yeniIndex);
+  tbody.appendChild(tr);
+}
+
+/* --- Son eli sil --- */
+function sonElSil() {
+  const tbody = document.querySelector('tbody');
+  const satirlar = tbody.querySelectorAll('tr');
+  if (satirlar.length > 1) {
+    tbody.removeChild(satirlar[satirlar.length - 1]);
+  }
+}
+
+/* --- Sabitler ve state fonksiyonları --- */
+const LS_KEY = 'okey101_state_v2';
+
 function stateTopla() {
   const state = {
     oyuncuIsimleri: Array.from(document.querySelectorAll('thead .oyuncu-isim'))
@@ -371,28 +518,58 @@ function stateTopla() {
     eller: [],
   };
 
-  document.querySelectorAll('tbody tr').forEach((tr) => {
+  const tbodyRows = document.querySelectorAll('tbody tr');
+
+  tbodyRows.forEach((tr) => {
     const el = [];
+    let elBosMu = true;
+
     tr.querySelectorAll('.player-cell').forEach((cell) => {
       const acmaKat = cell.querySelector('.kategori'); // ilk kategori
       const acmadi = acmaKat?.querySelector('[data-role="acmadi"]')?.classList.contains('aktif') || false;
 
       const kalanInput = cell.querySelector('.kalan-input');
-      const kalanDeger = kalanInput && kalanInput.value ? parseInt(kalanInput.value,10) : null;
+      const kalanDeger = kalanInput && kalanInput.value ? parseInt(kalanInput.value, 10) : null;
 
-      const bittiBtn = acmaKat?.querySelector('[data-role="bitti"]')?.classList.contains('aktif') || false;
-      const okey = cell.querySelector('.bitti-ekstra .okey')?.classList.contains('aktif') || false;
-      const elden = cell.querySelector('.bitti-ekstra .elden')?.classList.contains('aktif') || false;
+      const bittiBtnAktif = acmaKat?.querySelector('[data-role="bitti"]')?.classList.contains('aktif') || false;
+      const okeyBtnAktif = cell.querySelector('.bitti-ekstra .okey')?.classList.contains('aktif') || false;
+      const eldenBtnAktif = cell.querySelector('.bitti-ekstra .elden')?.classList.contains('aktif') || false;
 
       const masa = cell.querySelector('.masa-btn')?.classList.contains('aktif') || false;
-      const cezalar = Array.from(cell.querySelectorAll('.ceza-satiri span')).map(sp => parseInt(sp.textContent||'0',10)||0);
 
-      el.push({ acmadi, kalanDeger, bittiBtn, okey, elden, masa, cezalar });
+      const cezalar = Array.from(cell.querySelectorAll('.ceza-satiri span'))
+        .map(sp => parseInt(sp.textContent || '0', 10) || 0);
+
+      if (
+        acmadi ||
+        kalanDeger ||
+        bittiBtnAktif ||
+        okeyBtnAktif ||
+        eldenBtnAktif ||
+        masa ||
+        cezalar.some(c => c !== 0)
+      ) {
+        elBosMu = false;
+      }
+
+      el.push({
+        acmadi,
+        kalanDeger,
+        bittiBtn: bittiBtnAktif,
+        okey: okeyBtnAktif,
+        elden: eldenBtnAktif,
+        masa,
+        cezalar
+      });
     });
-    state.eller.push(el);
+
+    if (!elBosMu) {
+      state.eller.push(el);
+    }
   });
-    const pasifEller = [];
-  document.querySelectorAll('tbody tr').forEach((tr, idx) => {
+
+  const pasifEller = [];
+  tbodyRows.forEach((tr, idx) => {
     const ilkEl = tr.querySelector('.player-cell .secenek');
     if (ilkEl && getComputedStyle(ilkEl).pointerEvents === 'none') {
       pasifEller.push(idx);
@@ -412,15 +589,18 @@ function stateUygula(state) {
 
   // El sayısını eşitle (gerekenden azsa yeniElEkle ile çoğalt)
   const tbody = document.querySelector('tbody');
-  while (tbody.querySelectorAll('tr').length < state.eller.length) {
+  let mevcut = tbody.querySelectorAll('tr').length;
+  while (mevcut < state.eller.length) {
     yeniElEkle();
+    mevcut++;
   }
 
-  // Tüm hücreleri "temiz" baza çek
+  // Her şeyi sıfırla
   tbody.querySelectorAll('tr').forEach((tr) => {
-    tr.querySelectorAll('.secenek').forEach(s => { s.classList.remove('aktif'); s.style.display = 'inline-block'; });
+    tr.querySelectorAll('.secenek').forEach(s => s.classList.remove('aktif'));
+    tr.querySelectorAll('.bitti-ekstra span').forEach(s => s.classList.remove('aktif'));
     tr.querySelectorAll('.kalan-input').forEach(i => i.remove());
-    tr.querySelectorAll('.bitti-ekstra').forEach(e => e.remove());
+    tr.querySelectorAll('.bitti-ekstra').forEach(e => e.style.display = 'none');
     tr.querySelectorAll('.masa-btn').forEach(b => { b.classList.remove('aktif'); b.style.display = 'inline-block'; });
     tr.querySelectorAll('.ceza-satiri span').forEach(sp => sp.textContent = '0');
     tr.querySelectorAll('.player-cell .kategori').forEach(k => { k.style.display = 'block'; });
@@ -436,776 +616,344 @@ function stateUygula(state) {
     el.forEach((h, colIdx) => {
       const cell = cells[colIdx];
       if (!cell) return;
-
       const acmaKat = cell.querySelector('.kategori');
-      const acBtn   = acmaKat?.querySelector('[data-role="acmadi"]');
-      const kalBtn  = acmaKat?.querySelector('[data-role="kalan"]');
-      const bitBtn  = acmaKat?.querySelector('[data-role="bitti"]');
+      const bittiEkstra = cell.querySelector('.bitti-ekstra');
+      const secenekler = acmaKat ? acmaKat.querySelectorAll('.secenek') : [];
 
-      // Açamadı
-      if (h.acmadi && acBtn) {
-        acBtn.classList.add('aktif');
-        if (kalBtn) kalBtn.style.display = 'none';
-        if (bitBtn) bitBtn.style.display = 'none';
-		  const masaBtn = cell.querySelector('.masa-btn');
-		if (masaBtn) masaBtn.style.display = 'none';
+      // Açma durumu
+      if (h.acmadi && secenekler[0]) {
+        secenekler[0].classList.add('aktif');
+      } else if (h.kalanDeger && secenekler[1]) {
+        secenekler[1].classList.add('aktif');
+      } else if (h.bittiBtn && secenekler[2]) {
+        secenekler[2].classList.add('aktif');
       }
 
-      // Kalan
-      if (h.kalanDeger && kalBtn) {
-        // Butonu inputa çevir
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.className = 'kalan-input';
-        input.min = '1'; input.max = '252';
-        input.value = h.kalanDeger;
-        kalBtn.replaceWith(input);
-        if (acBtn) acBtn.style.display = 'none';
-        if (bitBtn) bitBtn.style.display = 'none';
-      }
-
-      // Bitti (+ okey/elden paneli)
-      if (h.bittiBtn && bitBtn) {
-        bitBtn.classList.add('aktif');
-        if (acBtn) acBtn.style.display = 'none';
-        if (kalBtn) kalBtn.style.display = 'none';
-
-        let ekstraDiv = document.createElement('div');
-        ekstraDiv.className = 'bitti-ekstra';
-        ekstraDiv.style.marginTop = '6px';
-        ekstraDiv.innerHTML = `
-          <div class="secenek okey ${h.okey ? 'aktif' : ''}">Okey ile</div>
-          <div class="secenek elden ${h.elden ? 'aktif' : ''}">Elden</div>
-        `;
-        acmaKat.insertAdjacentElement('afterend', ekstraDiv);
-
-        // Aynı elde diğer oyuncuların "Bitti" butonlarını gizle (senaryoda o anda biri bitmiş)
-        tr.querySelectorAll('.player-cell').forEach(c => {
-          if (c !== cell) {
-            const bb = c.querySelector('[data-role="bitti"]');
-            if (bb && !bb.classList.contains('aktif')) bb.style.display = 'none';
-          }
-        });
+      // Bitti altları
+      if (h.bittiBtn && bittiEkstra) {
+        bittiEkstra.style.display = 'block';
+        const okeySpan = bittiEkstra.querySelector('.okey');
+        const eldenSpan = bittiEkstra.querySelector('.elden');
+        if (h.okey && okeySpan) okeySpan.classList.add('aktif');
+        if (h.elden && eldenSpan) eldenSpan.classList.add('aktif');
       }
 
       // Masa
       const masaBtn = cell.querySelector('.masa-btn');
       if (masaBtn && h.masa) masaBtn.classList.add('aktif');
 
+      // Kalan
+      if (h.kalanDeger) {
+        // Butonu inputa çevir
+        const kalBtn = cell.querySelector('.secenek.kalan');
+        if (kalBtn) {
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.className = 'kalan-input';
+          input.min = '1'; input.max = '252';
+          input.value = h.kalanDeger;
+          kalBtn.replaceWith(input);
+        }
+      }
+
       // Cezalar
-      const spList = cell.querySelectorAll('.ceza-satiri span');
-      h.cezalar?.forEach((val, i) => { if (spList[i]) spList[i].textContent = String(val||0); });
+      const cezaSpans = cell.querySelectorAll('.ceza-satiri div span');
+      h.cezalar?.forEach((val, i) => {
+        if (cezaSpans[i]) cezaSpans[i].textContent = val;
+      });
     });
   });
 
-  // Önceki el kilitleme durumunu tekrar uygula (son el doluysa bir öncekini pasifleştir)
-  const aktifSatirlar = tbody.querySelectorAll('tr');
-  if (aktifSatirlar.length >= 2) {
-    const onceki = aktifSatirlar[aktifSatirlar.length - 2];
-    const son    = aktifSatirlar[aktifSatirlar.length - 1];
-
-    const sonAktif = !!son.querySelector('.secenek.aktif, .masa-btn.aktif, .bitti-ekstra') ||
-                     !!son.querySelector('.kalan-input');
-    let sonCezali = false;
-    son.querySelectorAll('.ceza-satiri span').forEach(sp => { if (parseInt(sp.textContent||'0',10) > 0) sonCezali = true; });
-
-    if (sonAktif || sonCezali) {
-      onceki.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-        el.classList.add('pasif');
-        el.style.pointerEvents = 'none';
-        el.style.opacity = '0.5';
-      });
-    }
-  }
-  
-  
-const tumSatirlar = document.querySelectorAll('tbody tr');
-tumSatirlar.forEach((tr) => {
-  const cells = tr.querySelectorAll('.player-cell');
-  cells.forEach((cell, idx) => {
-    const bitmeAktif = cell.querySelector('.secenek[data-role="bitti"].aktif');
-    if (bitmeAktif) {
-      const takimEs = (idx % 2 === 0) ? idx + 1 : idx - 1; // takım arkadaşı indeksi
-      const takimCell = cells[takimEs];
-      if (takimCell) {
-        
-        // 🔹 Takım arkadaşının Açma Durumu kategorisini gizle
-        // İlk kategori (Açma Durumu)
-        const acmaDurumu = takimCell.querySelector('.kategori:first-of-type'); 
-        if (acmaDurumu) acmaDurumu.style.display = 'none';
-
-        // 🔹 Bitti Ekstra (Okey/Elden) panelini gizle (varsa)
-        const bittiEkstra = takimCell.querySelector('.bitti-ekstra');
-        if (bittiEkstra) bittiEkstra.style.display = 'none';
-
-        // 🔹 Cezalar kategorisinin (ikinci kategori) görünür kalması için bir şey yapmaya gerek yok,
-        // zira gizlenmemişse varsayılan olarak görünür kalır.
-        
-        // 🔹 Elinde varsa inputu sil (value="" yapmak yerine tamamen kaldırılabilir)
-        const elInput = takimCell.querySelector('.kalan-input');
-        if (elInput) elInput.remove();
-
-        // 🔹 Masa butonu görünür kalsın (handleBitti'de gizlenmiş olabilir, burada garantile)
-        const masaBtn = takimCell.querySelector('.masa-btn');
-        if (masaBtn) masaBtn.style.display = 'inline-block';
-        
-        // 🔹 Tüm ceza satırlarını görünür yap (gizlenmiş olabilir)
-        takimCell.querySelectorAll('.ceza-satiri').forEach(el => {
-            el.style.display = 'flex';
-        });
-      }
-    }
-  });
-});
-
-// 🔹 Kaydedilmiş pasif elleri tekrar pasifleştir
-  if (state.pasifEller && state.pasifEller.length) {
-    const satirlar = document.querySelectorAll('tbody tr');
-    state.pasifEller.forEach(i => {
-      const tr = satirlar[i];
+  // Pasif eller
+  if (Array.isArray(state.pasifEller)) {
+    const tbody2 = document.querySelector('tbody');
+    const satirlar2 = tbody2.querySelectorAll('tr');
+    state.pasifEller.forEach((idx) => {
+      const tr = satirlar2[idx];
       if (!tr) return;
-      tr.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-        el.classList.add('pasif');
-        el.style.pointerEvents = 'none';
-        el.style.opacity = '0.5';
+      tr.querySelectorAll('.player-cell .secenek').forEach((secenek) => {
+        secenek.style.pointerEvents = 'none';
+        secenek.style.opacity = '0.6';
       });
     });
   }
-  
-// 🔹 Son el boşsa bir önceki eli yeniden aktif yap
 
-  if (satirlar.length >= 2) {
-    const onceki = satirlar[satirlar.length - 2];
-    const son = satirlar[satirlar.length - 1];
-
-    const aktifVarMi = son.querySelector('.secenek.aktif, .masa-btn.aktif, .bitti-ekstra');
-    const kalanInputVarMi = son.querySelector('.kalan-input');
-    let cezaVarMi = false;
-    son.querySelectorAll('.ceza-satiri span').forEach(sp => {
-      if (parseInt(sp.textContent || '0', 10) > 0) cezaVarMi = true;
-    });
-
-    // Eğer hiçbir şey yoksa (yani el boşsa)
-    if (!aktifVarMi && !kalanInputVarMi && !cezaVarMi) {
-      onceki.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-        el.classList.remove('pasif');
-        el.style.pointerEvents = 'auto';
-        el.style.opacity = '1';
-      });
-    }
-  }
-  
-  // Skorları tazele
-  toplamPuanHesapla();
+  puanlariHesapla();
 }
 
-// URL Hash kullanarak yedekleme
-function yedekAl() {
-  const state = stateTopla();
-  const encoded = btoa(JSON.stringify(state));
-  
-  // URL hash'ini güncelle
-  window.location.hash = encoded;
-  
-  // Kullanıcıya bilgi ver
-  alert('Yedek alındı! URL adresini kaydederek bu oyunu daha sonra devam ettirebilirsiniz.\n\nURL: ' + window.location.href);
-}
-
-function yedekYukle() {
-  const hash = window.location.hash.substring(1);
-  if (!hash) {
-    alert('URL\'de yedek bulunamadı!');
-    return;
-  }
-  
+function stateKaydet() {
   try {
-    const decoded = JSON.parse(atob(hash));
-    stateUygula(decoded);
-    alert('Yedek yüklendi!');
+    const s = stateTopla();
+    localStorage.setItem(LS_KEY, JSON.stringify(s));
   } catch (e) {
-    alert('Yedek yüklenirken hata oluştu: ' + e.message);
+    console.warn('Kaydetme hatası:', e);
   }
 }
 
-function yedekIcerikAl() {
-  const state = stateTopla();
-  return btoa(JSON.stringify(state));
-}
-
-function yedekIcerikYukle(backupData) {
+function stateYukle() {
   try {
-    const decoded = JSON.parse(atob(backupData));
-    stateUygula(decoded);
-    return true;
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    stateUygula(s);
   } catch (e) {
-    console.error('Yedek yükleme hatası:', e);
-    return false;
+    console.warn('Yükleme hatası:', e);
   }
 }
-
-// Manuel yedek yükleme için input
-function manuelYedekYukle() {
-  const backupData = prompt('Yedek verisini yapıştırın:');
-  if (backupData && yedekIcerikYukle(backupData)) {
-    alert('Yedek başarıyla yüklendi!');
-  } else {
-    alert('Yedek yüklenirken hata oluştu!');
-  }
-}
-
-// Sayfa yüklendiğinde URL'den yedek yükle
-function urlDenYukle() {
-  const hash = window.location.hash.substring(1);
-  if (hash) {
-    yedekIcerikYukle(hash);
-  }
-}
-
-// Yedek içeriğini panoya kopyala
-function yedekPanoyaKopyala() {
-  const backupData = yedekIcerikAl();
-  navigator.clipboard.writeText(backupData).then(() => {
-    alert('Yedek panoya kopyalandı! Bu veriyi kaydederek daha sonra kullanabilirsiniz.');
-  }).catch(() => {
-    // Fallback: textarea ile kopyalama
-    const textarea = document.createElement('textarea');
-    textarea.value = backupData;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    alert('Yedek panoya kopyalandı! Bu veriyi kaydederek daha sonra kullanabilirsiniz.');
-  });
-}
-
-// Buton event listener'ları
-document.getElementById('btnExport')?.addEventListener('click', yedekPanoyaKopyala);
-document.getElementById('btnImport')?.addEventListener('click', manuelYedekYukle);
-
-// Sayfa yüklendiğinde URL'den yedek yükle
-window.addEventListener('load', () => {
-  urlDenYukle();
-  roleriAta();
-});
-
-// ===============================================================================
-
-// --- Başlangıç: Açma Durumu üçlüsüne data-role ata ---
-function roleriAta() {
-  document.querySelectorAll('.player-cell .kategori:first-child').forEach(kat => {
-    const opts = kat.querySelectorAll('.secenek');
-    if (opts[0]) opts[0].dataset.role = 'acmadi';
-    if (opts[1]) { opts[1].dataset.role = 'kalan'; opts[1].classList.add('kalan'); }
-    if (opts[2]) opts[2].dataset.role = 'bitti';
-  });
-}
-
-// --- Yardımcı: hücre indexine göre takım arkadaşını bul ---
-function takimEsIndex(cell) {
-  const row = cell.closest('tr');
-  const idx = Array.from(row.children).indexOf(cell);
-  // El sütunu 0. index; oyuncular 1..4
-  if (idx === 1) return 2;
-  if (idx === 2) return 1;
-  if (idx === 3) return 4;
-  if (idx === 4) return 3;
-  return null;
-}
-
-function handleAcmadi(btn) {
-  const kat = btn.closest('.kategori');
-  const cell = btn.closest('.player-cell');
-  const kalan = kat.querySelector('[data-role="kalan"]');
-  const bitti = kat.querySelector('[data-role="bitti"]');
-  const masaBtn = cell.querySelector('.masa-btn');
-
-  const acikMi = btn.classList.toggle('aktif');
-
-  if (acikMi) {
-    // Buton aktif oldu → diğerlerini gizle
-    if (kalan) kalan.style.display = 'none';
-    if (bitti) bitti.style.display = 'none';
-    if (masaBtn) masaBtn.style.display = 'none';
-  } else {
-    // Buton pasif oldu → diğerlerini geri göster
-    if (kalan) kalan.style.display = 'inline-block';
-    if (bitti) bitti.style.display = 'inline-block';
-    if (masaBtn) masaBtn.style.display = 'inline-block';
-  }
-}
-
-function handleKalan(btn) {
-  const kat = btn.closest('.kategori');
-  const acamadi = kat.querySelector('[data-role="acmadi"]');
-  const bitti = kat.querySelector('[data-role="bitti"]');
-
-  // Açamadı ve Bitti butonlarını gizle
-  if (acamadi) acamadi.style.display = 'none';
-  if (bitti) bitti.style.display = 'none';
-
-  // Input oluştur
-  const input = document.createElement('input');
-  input.type = 'number';
-  input.className = 'kalan-input';
-  input.min = '1';
-  input.max = '252';
-  input.placeholder = '0';
-
-  // Butonun yerini input alır
-  btn.replaceWith(input);
-  input.focus();
-
-  // Input odak kaybedince kontrol et
-  input.addEventListener('blur', () => {
-    if (!input.value || +input.value < 1) {
-      // Değer yoksa: inputu kaldır, butonu geri getir
-      input.replaceWith(btn);
-      if (acamadi) acamadi.style.display = 'inline-block';
-      if (bitti) bitti.style.display = 'inline-block';
-    } else {
-      // Değer varsa: inputu kalıcı hale getir
-      input.value = String(Math.min(252, Math.max(1, +input.value)));
-      input.style.color = 'white';
-      input.style.fontWeight = 'bold';
-    }
-  });
-}
-
-function handleBitti(btn) {
-  const cell = btn.closest('.player-cell');
-  const row = cell.closest('tr');
-  const acmaKat = cell.querySelector('.kategori');
-  const acamadi = acmaKat.querySelector('[data-role="acmadi"]');
-  const kalanBtn = acmaKat.querySelector('[data-role="kalan"]');
-  const masaBtn = cell.querySelector('.masa-btn');
-  const aktifmiydi = btn.classList.contains('aktif');
-  const esIdx = takimEsIndex(cell);
-
-  // 🔹 İlk tıklama (aktifleşme)
-  if (!aktifmiydi) {
-    btn.classList.add('aktif');
-
-    // Kendi butonlarını gizle
-    if (acamadi) acamadi.style.display = 'none';
-    if (kalanBtn) kalanBtn.style.display = 'none';
-
-    // Okey/Elden panelini ekle
-    const ekstraDiv = document.createElement('div');
-    ekstraDiv.className = 'bitti-ekstra';
-    ekstraDiv.style.marginTop = '6px';
-    ekstraDiv.innerHTML = `
-      <div class="secenek okey">Okey ile</div>
-      <div class="secenek elden">Elden</div>
-    `;
-    acmaKat.insertAdjacentElement('afterend', ekstraDiv);
-
-    // Diğer oyuncuların Bitti butonlarını gizle
-    row.querySelectorAll('.player-cell').forEach(c => {
-      if (c !== cell) {
-        const b = c.querySelector('[data-role="bitti"]');
-        if (b && !b.classList.contains('aktif')) b.style.display = 'none';
-      }
-    });
-
-    // 🔧 Takım arkadaşını sıfırla + gizle + MASA'yı nötrle ve görünür yap
-    if (esIdx) {
-      const esCell = row.children[esIdx];
-      const esAcma = esCell.querySelector('.kategori');
-      const esMasa = esCell.querySelector('.masa-btn');
-      if (esAcma) {
-        esAcma.querySelectorAll('.secenek').forEach(s => s.classList.remove('aktif'));
-        const kalInput = esAcma.querySelector('.kalan-input');
-        if (kalInput) kalInput.remove();
-        esAcma.style.display = 'none';
-      }
-      if (esMasa) {
-        esMasa.classList.remove('aktif');
-        esMasa.style.display = 'inline-block';   // 👈 EKLENDİ
-      }
-    }
-
-  // 🔸 İkinci tıklama (geri alma)
-  } else {
-    btn.classList.remove('aktif');
-
-    // Okey/Elden panelini kaldır
-    const ekstra = cell.querySelector('.bitti-ekstra');
-    if (ekstra) ekstra.remove();
-
-    // Kendi butonlarını geri getir
-    if (acamadi) acamadi.style.display = 'inline-block';
-    if (kalanBtn) kalanBtn.style.display = 'inline-block';
-    if (masaBtn) { masaBtn.classList.remove('aktif'); masaBtn.style.display = 'inline-block'; }
-
-    // Diğer oyuncuların Bitti butonlarını geri getirirken kontrol yap
-    row.querySelectorAll('.player-cell').forEach(c => {
-      if (c !== cell) {
-        const b = c.querySelector('[data-role="bitti"]');
-        const acmadiBtn = c.querySelector('[data-role="acmadi"]');
-        const kalanBtn2 = c.querySelector('[data-role="kalan"]');
-        const kalanInput = c.querySelector('.kalan-input');
-
-        const aktifAcmadi = acmadiBtn && acmadiBtn.classList.contains('aktif');
-        const aktifKalan = kalanBtn2 && kalanBtn2.classList.contains('aktif');
-        const kalanDegerGirildi = Boolean(kalanInput && kalanInput.value);
-
-        if (b) {
-          if (aktifAcmadi || aktifKalan || kalanDegerGirildi) {
-            b.style.display = 'none';
-          } else {
-            b.style.display = 'inline-block';
-          }
-        }
-      }
-    });
-
-    // Takım arkadaşını geri getir ve sıralı şekilde sıfırla
-    if (esIdx) {
-      const esCell = row.children[esIdx];
-      const esAcma = esCell.querySelector('.kategori');
-	  const esMasa = esCell.querySelector('.masa-btn');
-      if (esAcma) {
-        esAcma.style.display = 'block';
-
-        // Kalan butonu yoksa yeniden oluştur ama doğru sıraya yerleştir
-        let kalanBtn = esAcma.querySelector('[data-role="kalan"]');
-        if (!kalanBtn) {
-          kalanBtn = document.createElement('div');
-          kalanBtn.className = 'secenek kalan';
-          kalanBtn.dataset.role = 'kalan';
-          kalanBtn.textContent = 'Kalan';
-
-          const bittiBtn = esAcma.querySelector('[data-role="bitti"]');
-          if (bittiBtn) {
-            bittiBtn.insertAdjacentElement('beforebegin', kalanBtn);
-          } else {
-            esAcma.appendChild(kalanBtn);
-          }
-        }
-
-        // Tüm butonları aktiflikten çıkar ve görünür hale getir
-        ['acmadi','kalan','bitti'].forEach(r => {
-          const el = esAcma.querySelector(`[data-role="${r}"]`);
-          if (el) {
-            el.classList.remove('aktif');
-            el.style.display = 'inline-block';
-          }
-        });
-      }
-    }
-  }
-}
-
-
-document.addEventListener('click', (e) => {
-  const btn = e.target.closest('.secenek, .masa-btn, .artir, .azalt');
-  if (!btn) return;
-
-  // --- AÇAMADI ---
-  if (btn.dataset.role === 'acmadi') {
-  handleAcmadi(btn);
-  return;
-}
-  // --- KALAN (buton) -> inputa dönüşecek ---
-if (btn.dataset.role === 'kalan') {
-  handleKalan(btn);
-  return;
-}
-
-  // --- BİTTİ (toggle) ---
-if (btn.dataset.role === 'bitti') {
-  handleBitti(btn);
-  return;
-}
-
-  // --- OKEY / ELDEN (Bitti sonrası çıkanları tıkla) ---
-  if (btn.classList.contains('okey') || btn.classList.contains('elden')) {
-    btn.classList.toggle('aktif'); // birlikte de seçilebilir
-    return;
-  }
-
-  // --- MASA SAYISI (toggle) ---
-  if (btn.classList.contains('masa-btn')) {
-    btn.classList.toggle('aktif');
-    return;
-  }
-
-  // --- CEZA BUTONLARI (artır/azalt, min 0) ---
-  if (btn.classList.contains('artir') || btn.classList.contains('azalt')) {
-    const satir = btn.closest('.ceza-satiri');
-    if (!satir) return;
-
-    const degerEl = satir.querySelector('span');
-    let val = parseInt(degerEl?.textContent || '0', 10) || 0;
-
-    if (btn.classList.contains('artir')) {
-      val += 1;
-    } else {
-      val = Math.max(0, val - 1); // min 0
-    }
-
-    degerEl.textContent = String(val);
-    return;
-  }
-});
-
-function tumOyuncularAldiMi(row) {
-  const cells = row.querySelectorAll('.player-cell');
-  return Array.from(cells).every(cell => {
-    const acmaKat = cell.querySelector('.kategori');
-    if (!acmaKat) return false;
-    const aktif = acmaKat.querySelector('.secenek.aktif, .kalan-input');
-    const esIdx = takimEsIndex(cell);
-    // Takım arkadaşı bitti ise bu oyuncu da tamam sayılır
-    let esTamam = false;
-    if (esIdx) {
-      const esCell = row.children[esIdx];
-      const esBitti = esCell.querySelector('[data-role="bitti"].aktif');
-      if (esBitti) esTamam = true;
-    }
-    return Boolean(aktif) || esTamam;
-  });
-}
-
-// --- Yeni el ekleme fonksiyonu ---
-function yeniElEkle() {
-  const tbody = document.querySelector('tbody');
-  const satirlar = tbody.querySelectorAll('tr');
-  const sonSatir = satirlar[satirlar.length - 1];
-  const yeniElNo = satirlar.length + 1;
-  const yeniSatir = sonSatir.cloneNode(true);
-  yeniSatir.querySelector('td:first-child').innerHTML = `<b>${yeniElNo}</b>`;
-  yeniSatir.querySelectorAll('.secenek').forEach(s => {
-    s.classList.remove('aktif');
-    s.style.display = 'inline-block';
-  });
-  yeniSatir.querySelectorAll('.kalan-input').forEach(i => i.remove());
-  yeniSatir.querySelectorAll('.bitti-ekstra').forEach(e => e.remove());
-  yeniSatir.querySelectorAll('.masa-btn').forEach(b => {
-    b.classList.remove('aktif');
-    b.style.display = 'inline-block';
-  });
-  yeniSatir.querySelectorAll('.ceza-satiri span').forEach(sp => sp.textContent = '0');
-  yeniSatir.querySelectorAll('.player-cell .kategori').forEach(k => {
-    k.style.display = 'block';
-  });
-  yeniSatir.querySelectorAll('.player-cell').forEach(cell => {
-    const acmaKat = cell.querySelector('.kategori');
-    if (acmaKat && !acmaKat.querySelector('[data-role="kalan"]')) {
-      const kalanBtn = document.createElement('div');
-      kalanBtn.className = 'secenek kalan';
-      kalanBtn.dataset.role = 'kalan';
-      kalanBtn.textContent = 'Kalan';
-      const bittiBtn = acmaKat.querySelector('[data-role="bitti"]');
-      if (bittiBtn) bittiBtn.insertAdjacentElement('beforebegin', kalanBtn);
-    }
-  });
-  tbody.appendChild(yeniSatir);
-  roleriAta();
-}
-
-// Her tıklamadan sonra kontrol et
-document.addEventListener('click', () => {
-  const tbody = document.querySelector('tbody');
-  const satirlar = tbody.querySelectorAll('tr');
-  const sonSatir = satirlar[satirlar.length - 1];
-
-  if (tumOyuncularAldiMi(sonSatir)) {
-    yeniElEkle();
-  }
-});
-
-document.addEventListener('click', (e) => {
-  const hedef = e.target.closest('.secenek, .masa-btn, .artir, .azalt, .kalan-input');
-  if (!hedef) return;
-
-  const aktifSatirlar = document.querySelectorAll('tbody tr');
-  if (aktifSatirlar.length < 2) return;
-
-  const tiklananSatir = hedef.closest('tr');
-  const tiklananIndex = Array.from(aktifSatirlar).indexOf(tiklananSatir);
-  const sonIndex = aktifSatirlar.length - 1;
-  const oncekiSatir = aktifSatirlar[sonIndex - 1];
-  const sonSatir = aktifSatirlar[sonIndex];
-
-  // 🔹 1. Yeni el aktif olunca önceki eli pasifleştir
-  if (tiklananIndex === sonIndex) {
-    oncekiSatir.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-      el.classList.add('pasif');
-      el.style.pointerEvents = 'none';
-      el.style.opacity = '0.5';
-    });
-  }
-
-  // 🔹 2. Her tıklamadan sonra kontrol: son elde hiç seçim kalmadıysa, önceki eli geri aktif et
-  setTimeout(() => {
-    const aktifVarMi = sonSatir.querySelector('.secenek.aktif, .masa-btn.aktif, .bitti-ekstra');
-    const kalanInputVarMi = sonSatir.querySelector('.kalan-input');
-    let cezaVarMi = false;
-    sonSatir.querySelectorAll('.ceza-satiri span').forEach(sp => {
-      if (parseInt(sp.textContent || '0', 10) > 0) cezaVarMi = true;
-    });
-
-    // Eğer hiçbir aktif seçim, input ya da ceza yoksa:
-    if (!aktifVarMi && !kalanInputVarMi && !cezaVarMi) {
-      oncekiSatir.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-        el.classList.remove('pasif');
-        el.style.pointerEvents = 'auto';
-        el.style.opacity = '1';
-      });
-    }
-  }, 100);
-  toplamPuanHesapla();
-});
-document.addEventListener('input', (e) => {
-  const input = e.target.closest('.kalan-input');
-  if (!input) return;
-
-  const row = input.closest('tr');
-  const tbody = row.closest('tbody');
-  const satirlar = tbody.querySelectorAll('tr');
-  const sonIndex = satirlar.length - 1;
-  const sonSatir = satirlar[sonIndex];
-  const oncekiSatir = satirlar[sonIndex - 1];
-
-  // Eğer bu input son eldeyse ve tamamen temizlendiyse:
-  if (row === sonSatir && input.value.trim() === '') {
-    // Diğer aktif elemanlar da yoksa geri aktif yap
-    const aktifVarMi = sonSatir.querySelector('.secenek.aktif, .masa-btn.aktif, .bitti-ekstra');
-    let cezaVarMi = false;
-    sonSatir.querySelectorAll('.ceza-satiri span').forEach(sp => {
-      if (parseInt(sp.textContent || '0', 10) > 0) cezaVarMi = true;
-    });
-
-    if (!aktifVarMi && !cezaVarMi) {
-      oncekiSatir.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-        el.classList.remove('pasif');
-        el.style.pointerEvents = 'auto';
-        el.style.opacity = '1';
-      });
-    }
-  }
-  toplamPuanHesapla();
-});
 
 function yeniOyunSifirla() {
-  if (confirm('Yeni oyun başlatmak istediğinizden emin misiniz? Mevcut veriler silinecektir.')) {
-    window.location.hash = '';
-    location.reload();
+  localStorage.removeItem(LS_KEY);
+  location.reload(); // en güvenlisi: sayfayı ilk haline al
+}
+
+// ==== DOSYA TABANLI YEDEKLEME (GitHub Pages + her yerde çalışır) ====
+
+function yedekDosyaIcindekiVeri() {
+  const state = stateTopla();          // mevcut durumu topla
+  const encoded = btoa(JSON.stringify(state)); // base64
+  return encoded;
+}
+
+function yedekIndir() {
+  try {
+    const data = yedekDosyaIcindekiVeri();
+    const blob = new Blob([data], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "okey101_yedek_" + new Date().toISOString().slice(0, 10) + ".txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error("Yedek indirme hatası:", e);
+    alert("Yedek alınırken bir hata oluştu.");
   }
 }
 
-document.getElementById('btnYeniOyun')?.addEventListener('click', yeniOyunSifirla);
-
-// 🔹 TOPLAM PUAN HESAPLAMA FONKSİYONU
-function toplamPuanHesapla() {
-  const tbody = document.querySelector('tbody');
-  const satirlar = tbody.querySelectorAll('tr');
-  const toplamlar = [0, 0, 0, 0]; // Oyuncu 1-4 toplam puanları
-
-  satirlar.forEach(row => {
-    const hucreler = row.querySelectorAll('.player-cell');
-    let bitenIndex = null;
-    let carpim = 1;
-
-    // 🔹 Önce kimin "bitti" olduğunu ve çarpanı tespit et
-    hucreler.forEach((cell, i) => {
-      const bittiBtn = cell.querySelector('.secenek[data-role="bitti"].aktif');
-      const okey = cell.querySelector('.bitti-ekstra .okey.aktif');
-      const elden = cell.querySelector('.bitti-ekstra .elden.aktif');
-
-      if (bittiBtn) {
-        bitenIndex = i;
-        if (okey && elden) carpim = 4;
-        else if (okey || elden) carpim = 2;
-        else carpim = 1;
-      }
-    });
-
-    const elPuanlari = [0, 0, 0, 0];
-
-    // 🔸 Her oyuncunun puanını hesapla
-    hucreler.forEach((cell, i) => {
-      const acmadi = cell.querySelector('.secenek[data-role="acmadi"].aktif');
-      const kalanInput = cell.querySelector('.kalan-input');
-      const bittiBtn = cell.querySelector('.secenek[data-role="bitti"].aktif');
-      const okey = cell.querySelector('.bitti-ekstra .okey.aktif');
-      const elden = cell.querySelector('.bitti-ekstra .elden.aktif');
-      const masa = cell.querySelector('.masa-btn.aktif');
-      const cezalar = cell.querySelectorAll('.ceza-satiri span');
-
-      let puan = 0;
-
-      // 🟢 Açma durumuna göre
-      if (acmadi) puan += 202;
-      else if (kalanInput && kalanInput.value) puan += parseInt(kalanInput.value);
-      else if (bittiBtn) {
-        if (okey && elden) puan -= 202;
-        else if (okey) puan -= 101;
-        else if (elden) puan -= 202;
-        else puan -= 101;
-      }
-
-      // 🔸 Masa cezası
-      if (masa) puan -= 101;
-
-      // 🔸 Cezalar (çarpan dışında)
-      cezalar.forEach(span => {
-        const adet = parseInt(span.textContent || '0', 10);
-        if (adet > 0) puan += adet * 101;
-      });
-
-      elPuanlari[i] = puan;
-    });
-
-    // 🔹 Takım eşleri
-    const takimEs = { 0: 1, 1: 0, 2: 3, 3: 2 };
-
-    // 🔸 Biten oyuncu varsa özel durumlar
-    if (bitenIndex !== null) {
-      const esIndex = takimEs[bitenIndex];
-
-      // Takım arkadaşı 0 alır
-      const esCell = hucreler[esIndex];
-if (esCell) {
-  let cezaToplam = 0;
-  const masa = esCell.querySelector('.masa-btn.aktif');
-  const cezalar = esCell.querySelectorAll('.ceza-satiri span');
-  cezalar.forEach(span => {
-    const adet = parseInt(span.textContent || '0', 10);
-    if (adet > 0) cezaToplam += adet * 101;
-  });
-  if (masa) cezaToplam -= 101;
-  elPuanlari[esIndex] = cezaToplam; // sadece ceza etkileri kalır
+function yedekDosyadanYukle(icerik) {
+  try {
+    const decoded = JSON.parse(atob(icerik.trim()));
+    stateUygula(decoded);
+    alert("Yedek başarıyla yüklendi.");
+  } catch (e) {
+    console.error(e);
+    alert("Yedek okunamadı / bozuk: " + e.message);
+  }
 }
-// Diğer iki oyuncunun puanı çarpılır ama sadece kalan/açamadı puanları
-hucreler.forEach((cell, i) => {
-  if (i !== bitenIndex && i !== esIndex) {
-    const acmadi = cell.querySelector('.secenek[data-role="acmadi"].aktif');
-    const kalanInput = cell.querySelector('.kalan-input');
 
-    let puan = 0;
-    if (acmadi) puan = 202;
-    else if (kalanInput && kalanInput.value) puan = parseInt(kalanInput.value);
+window.addEventListener("load", () => {
+  const btnExport = document.getElementById("btnExport");
+  const btnImport = document.getElementById("btnImport");
+  const fileInput = document.getElementById("backupFileInput");
 
-    // sadece bu puan kısmını çarp
-    elPuanlari[i] += puan * (carpim - 1);
+  if (btnExport) {
+    btnExport.addEventListener("click", yedekIndir);
+  }
+
+  if (btnImport && fileInput) {
+    btnImport.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const content = reader.result || "";
+        yedekDosyadanYukle(content);
+      };
+      reader.readAsText(file);
+    });
   }
 });
+
+// --- Olaylara bağla: her tıklama ve input sonrası kaydet
+document.addEventListener('click', (e) => {
+  const hedef = e.target;
+
+  if (hedef.classList.contains('secenek')) {
+    const tr = enYakinTR(hedef);
+    // Aynı satır ve aynı oyuncu içinde sadece biri aktif olsun
+    const parentKategori = hedef.closest('.kategori');
+    if (parentKategori) {
+      parentKategori.querySelectorAll('.secenek').forEach(s => s.classList.remove('aktif'));
     }
-    // 🔹 Toplamları ekle
-    elPuanlari.forEach((p, i) => toplamlar[i] += p);
+    hedef.classList.add('aktif');
+
+    // Kalan'a tıklanırsa input'a çevir
+    if (hedef.classList.contains('kalan')) {
+      const cell = hedef.closest('.player-cell');
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.className = 'kalan-input';
+      input.min = '1';
+      input.max = '252';
+      input.placeholder = 'Kalan';
+      hedef.replaceWith(input);
+      input.focus();
+    }
+
+    // Bitti'ye tıklanırsa ekstra seçenekleri göster
+    if (hedef.textContent.trim() === 'Bitti') {
+      const cell = hedef.closest('.player-cell');
+      if (cell) {
+        const ekstra = cell.querySelector('.bitti-ekstra');
+        if (ekstra) ekstra.style.display = 'block';
+        const masaBtn = cell.querySelector('.masa-btn');
+        if (masaBtn) masaBtn.style.display = 'none';
+      }
+    }
+
+    // Açamadı'ya tıklanırsa kalan inputunu kaldır, ekstra kapat
+    if (hedef.textContent.trim() === 'Açamadı') {
+      const cell = hedef.closest('.player-cell');
+      if (cell) {
+        const kalanInput = cell.querySelector('.kalan-input');
+        if (kalanInput) {
+          const yeniButon = document.createElement('div');
+          yeniButon.className = 'secenek kalan';
+          yeniButon.textContent = 'Kalan';
+          kalanInput.replaceWith(yeniButon);
+        }
+        const ekstra = cell.querySelector('.bitti-ekstra');
+        if (ekstra) ekstra.style.display = 'none';
+
+        const masaBtn = cell.querySelector('.masa-btn');
+        if (masaBtn) {
+          masaBtn.style.display = 'inline-block';
+          masaBtn.classList.remove('aktif');
+        }
+      }
+    }
+
+    puanlariHesapla();
+    stateKaydet();
+  }
+
+  // Bitti ekstra (Okey/Elden) tıklamaları
+  if (hedef.closest('.bitti-ekstra span')) {
+    hedef.classList.toggle('aktif');
+    puanlariHesapla();
+    stateKaydet();
+  }
+
+  // Masa butonu
+  if (hedef.classList.contains('masa-btn')) {
+    hedef.classList.toggle('aktif');
+    puanlariHesapla();
+    stateKaydet();
+  }
+
+  // Ceza +/- butonları
+  if (hedef.classList.contains('ceza-arti') || hedef.classList.contains('ceza-eksi')) {
+    const span = hedef.parentElement.querySelector('span');
+    let deger = parseInt(span.textContent || '0', 10);
+    if (hedef.classList.contains('ceza-arti')) {
+      deger++;
+    } else {
+      deger = Math.max(0, deger - 1);
+    }
+    span.textContent = deger;
+    puanlariHesapla();
+    stateKaydet();
+  }
+
+  // Yeni El butonu
+  if (hedef.id === 'btnYeniEl') {
+    yeniElEkle();
+    stateKaydet();
+  }
+
+  // Son El Sil butonu
+  if (hedef.id === 'btnSilEl') {
+    sonElSil();
+    puanlariHesapla();
+    stateKaydet();
+  }
+
+  // Yeni Oyun butonu
+  if (hedef.id === 'btnYeniOyun') {
+    if (confirm('Tüm oyunu sıfırlamak istediğine emin misin?')) {
+      yeniOyunSifirla();
+    }
+  }
+});
+
+// Input değişince (kalan inputu veya isimler)
+document.addEventListener('input', (e) => {
+  const hedef = e.target;
+  if (hedef.classList.contains('kalan-input') || hedef.classList.contains('oyuncu-isim')) {
+    puanlariHesapla();
+    stateKaydet();
+  }
+});
+
+/* --- Puan Hesaplama --- */
+function puanlariHesapla() {
+  const tbody = document.querySelector('tbody');
+  const satirlar = tbody.querySelectorAll('tr');
+
+  let toplamPuan = [0, 0, 0, 0]; // Oyuncu 1-4
+
+  satirlar.forEach((tr, elIndex) => {
+    const hucreler = tr.querySelectorAll('.player-cell');
+    hucreler.forEach((cell, oyuncuIndex) => {
+      let puan = 0;
+
+      const acmaKat = cell.querySelector('.kategori');
+      const acmadi = acmaKat?.querySelector('.secenek:nth-child(2)')?.classList.contains('aktif');
+      const kalanBtn = cell.querySelector('.kalan-input');
+      const bittiAktif = acmaKat?.querySelector('.secenek:nth-child(4)')?.classList.contains('aktif');
+
+      const okeyAktif = cell.querySelector('.bitti-ekstra .okey')?.classList.contains('aktif');
+      const eldenAktif = cell.querySelector('.bitti-ekstra .elden')?.classList.contains('aktif');
+
+      const masaAktif = cell.querySelector('.masa-btn')?.classList.contains('aktif');
+
+      if (acmadi) {
+        puan += 20;
+      }
+
+      if (kalanBtn && kalanBtn.value) {
+        puan += parseInt(kalanBtn.value, 10) || 0;
+      }
+
+      if (bittiAktif) {
+        puan -= 100;
+        if (okeyAktif) puan -= 50;
+        if (eldenAktif) puan -= 20;
+      }
+
+      if (masaAktif) {
+        puan += 20;
+      }
+
+      const cezaSpans = cell.querySelectorAll('.ceza-satiri div span');
+      const cezaDegerler = Array.from(cezaSpans).map(sp => parseInt(sp.textContent || '0', 10));
+      const cezaCarpanlar = [5, 10, 20];
+
+      cezaDegerler.forEach((adet, idx) => {
+        puan += adet * cezaCarpanlar[idx];
+      });
+
+      toplamPuan[oyuncuIndex] += puan;
+    });
   });
 
-  // 🔸 Alt kısımdaki "Toplam" satırını güncelle
-  const tfoot = document.querySelector('tfoot tr:last-child');
-  if (tfoot) {
-    const tds = tfoot.querySelectorAll('td');
-    toplamlar.forEach((t, i) => {
-      if (tds[i + 1]) tds[i + 1].textContent = t;
-    });
-  }
+  document.getElementById('toplam1').textContent = toplamPuan[0];
+  document.getElementById('toplam2').textContent = toplamPuan[1];
+  document.getElementById('toplam3').textContent = toplamPuan[2];
+  document.getElementById('toplam4').textContent = toplamPuan[3];
 }
+
+/* --- Sayfa yüklenince localStorage'dan yükle --- */
+window.addEventListener('load', () => {
+  stateYukle();
+  puanlariHesapla();
+});
 </script>
 </body>
 </html>
