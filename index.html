@@ -488,86 +488,7 @@ function stateUygula(state) {
     });
   });
 
-  // Önceki el kilitleme kontrolü
-  const aktifSatirlar = tbody.querySelectorAll('tr');
-  if (aktifSatirlar.length >= 2) {
-    const onceki = aktifSatirlar[aktifSatirlar.length - 2];
-    const son    = aktifSatirlar[aktifSatirlar.length - 1];
-
-    const sonAktif = !!son.querySelector('.secenek.aktif, .masa-btn.aktif, .bitti-ekstra') ||
-                     !!son.querySelector('.kalan-input');
-    let sonCezali = false;
-    son.querySelectorAll('.ceza-satiri span').forEach(sp => { if (parseInt(sp.textContent||'0',10) > 0) sonCezali = true; });
-
-    if (sonAktif || sonCezali) {
-      onceki.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-        el.classList.add('pasif');
-        el.style.pointerEvents = 'none';
-        el.style.opacity = '0.5';
-      });
-    }
-  }
-
-  // Biten oyuncunun takım arkadaşını tekrar düzenle (eski kayıtlar için)
-  const tumSatirlar = document.querySelectorAll('tbody tr');
-  tumSatirlar.forEach((tr) => {
-    const cells = tr.querySelectorAll('.player-cell');
-    cells.forEach((cell, idx) => {
-      const bitmeAktif = cell.querySelector('.secenek[data-role="bitti"].aktif');
-      if (bitmeAktif) {
-        const takimEs = (idx % 2 === 0) ? idx + 1 : idx - 1;
-        const takimCell = cells[takimEs];
-        if (takimCell) {
-          const acmaDurumu = takimCell.querySelector('.kategori:first-of-type'); 
-          if (acmaDurumu) acmaDurumu.style.display = 'none';
-          const bittiEkstra = takimCell.querySelector('.bitti-ekstra');
-          if (bittiEkstra) bittiEkstra.style.display = 'none';
-          const elInput = takimCell.querySelector('.kalan-input');
-          if (elInput) elInput.remove();
-          const masaBtn = takimCell.querySelector('.masa-btn');
-          if (masaBtn) masaBtn.style.display = 'inline-block';
-          takimCell.querySelectorAll('.ceza-satiri').forEach(el => {
-            el.style.display = 'flex';
-          });
-        }
-      }
-    });
-  });
-
-  // Eski pasif elleri geri pasifleştir
-  if (state.pasifEller && state.pasifEller.length) {
-    const satirlar2 = document.querySelectorAll('tbody tr');
-    state.pasifEller.forEach(i => {
-      const tr = satirlar2[i];
-      if (!tr) return;
-      tr.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-        el.classList.add('pasif');
-        el.style.pointerEvents = 'none';
-        el.style.opacity = '0.5';
-      });
-    });
-  }
-
-  // Son el boşsa bir önceki eli aktif et
-  if (satirlar.length >= 2) {
-    const onceki = satirlar[satirlar.length - 2];
-    const son = satirlar[satirlar.length - 1];
-
-    const aktifVarMi = son.querySelector('.secenek.aktif, .masa-btn.aktif, .bitti-ekstra');
-    const kalanInputVarMi = son.querySelector('.kalan-input');
-    let cezaVarMi = false;
-    son.querySelectorAll('.ceza-satiri span').forEach(sp => {
-      if (parseInt(sp.textContent || '0', 10) > 0) cezaVarMi = true;
-    });
-
-    if (!aktifVarMi && !kalanInputVarMi && !cezaVarMi) {
-      onceki.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-        el.classList.remove('pasif');
-        el.style.pointerEvents = 'auto';
-        el.style.opacity = '1';
-      });
-    }
-  }
+  oncekiEllerinKilidiniGuncelle();
 
   // Skorları tazele
   toplamPuanHesapla();
@@ -908,6 +829,59 @@ if (btn.dataset.role === 'bitti') {
   }
 });
 //-----------------------------------------------------------------------------------------↑
+function satirKilidiUygula(row, kilitli) {
+  if (!row) return;
+  row.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
+    if (kilitli) {
+      el.classList.add('pasif');
+      el.style.pointerEvents = 'none';
+      el.style.opacity = '0.5';
+    } else {
+      el.classList.remove('pasif');
+      el.style.pointerEvents = 'auto';
+      el.style.opacity = '1';
+    }
+  });
+}
+
+function satirVeriVarMi(row) {
+  if (!row) return false;
+
+  if (row.querySelector('.secenek.aktif, .masa-btn.aktif')) return true;
+
+  const kalanInputlar = row.querySelectorAll('.kalan-input');
+  for (const input of kalanInputlar) {
+    if (input.value.trim() !== '') return true;
+  }
+
+  let cezaVarMi = false;
+  row.querySelectorAll('.ceza-satiri span').forEach(sp => {
+    if (parseInt(sp.textContent || '0', 10) > 0) cezaVarMi = true;
+  });
+  return cezaVarMi;
+}
+
+function oncekiEllerinKilidiniGuncelle() {
+  const satirlar = Array.from(document.querySelectorAll('tbody tr'));
+  if (!satirlar.length) return;
+
+  const sonIndex = satirlar.length - 1;
+
+  satirlar.forEach((row, i) => {
+    if (i < sonIndex - 1) {
+      satirKilidiUygula(row, true);
+      return;
+    }
+
+    if (i === sonIndex - 1) {
+      satirKilidiUygula(row, satirVeriVarMi(satirlar[sonIndex]));
+      return;
+    }
+
+    satirKilidiUygula(row, false);
+  });
+}
+
 function tumOyuncularAldiMi(row) {
   const cells = row.querySelectorAll('.player-cell');
   return Array.from(cells).every(cell => {
@@ -961,6 +935,7 @@ function yeniElEkle() {
   });
   tbody.appendChild(yeniSatir);
   roleriAta();
+  oncekiEllerinKilidiniGuncelle();
 }
 
 // Her tıklamadan sonra kontrol et
@@ -978,72 +953,16 @@ document.addEventListener('click', (e) => {
   const hedef = e.target.closest('.secenek, .masa-btn, .artir, .azalt, .kalan-input');
   if (!hedef) return;
 
-  const aktifSatirlar = document.querySelectorAll('tbody tr');
-  if (aktifSatirlar.length < 2) return;
-
-  const tiklananSatir = hedef.closest('tr');
-  const tiklananIndex = Array.from(aktifSatirlar).indexOf(tiklananSatir);
-  const sonIndex = aktifSatirlar.length - 1;
-  const oncekiSatir = aktifSatirlar[sonIndex - 1];
-  const sonSatir = aktifSatirlar[sonIndex];
-
-  // 🔹 1. Yeni el aktif olunca önceki eli pasifleştir
-  if (tiklananIndex === sonIndex) {
-    oncekiSatir.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-      el.classList.add('pasif');
-      el.style.pointerEvents = 'none';
-      el.style.opacity = '0.5';
-    });
-  }
-
-  // 🔹 2. Her tıklamadan sonra kontrol: son elde hiç seçim kalmadıysa, önceki eli geri aktif et
   setTimeout(() => {
-    const aktifVarMi = sonSatir.querySelector('.secenek.aktif, .masa-btn.aktif, .bitti-ekstra');
-    const kalanInputVarMi = sonSatir.querySelector('.kalan-input');
-    let cezaVarMi = false;
-    sonSatir.querySelectorAll('.ceza-satiri span').forEach(sp => {
-      if (parseInt(sp.textContent || '0', 10) > 0) cezaVarMi = true;
-    });
-
-    // Eğer hiçbir aktif seçim, input ya da ceza yoksa:
-    if (!aktifVarMi && !kalanInputVarMi && !cezaVarMi) {
-      oncekiSatir.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-        el.classList.remove('pasif');
-        el.style.pointerEvents = 'auto';
-        el.style.opacity = '1';
-      });
-    }
-  }, 100);
-  toplamPuanHesapla();
+    oncekiEllerinKilidiniGuncelle();
+    toplamPuanHesapla();
+  }, 0);
 });
 document.addEventListener('input', (e) => {
   const input = e.target.closest('.kalan-input');
   if (!input) return;
 
-  const row = input.closest('tr');
-  const tbody = row.closest('tbody');
-  const satirlar = tbody.querySelectorAll('tr');
-  const sonIndex = satirlar.length - 1;
-  const sonSatir = satirlar[sonIndex];
-  const oncekiSatir = satirlar[sonIndex - 1];
-
-  // Eğer bu input son eldeyse ve tamamen temizlendiyse:
-  if (row === sonSatir && input.value.trim() === '') {
-    // Diğer aktif elemanlar da yoksa geri aktif yap
-    const aktifVarMi = sonSatir.querySelector('.secenek.aktif, .masa-btn.aktif, .bitti-ekstra');
-    let cezaVarMi = false;
-    sonSatir.querySelectorAll('.ceza-satiri span').forEach(sp => {
-      if (parseInt(sp.textContent || '0', 10) > 0) cezaVarMi = true;
-    });
-
-    if (!aktifVarMi && !cezaVarMi) {
-      oncekiSatir.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
-        el.classList.remove('pasif');
-        el.style.pointerEvents = 'auto';
-        el.style.opacity = '1';
-      });
-    }
-  }
+  oncekiEllerinKilidiniGuncelle();
   toplamPuanHesapla();
 });
 
