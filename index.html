@@ -573,10 +573,40 @@ function stateUygula(state) {
   toplamPuanHesapla();
 }
 
+const memoryStorage = {};
+
+function storageSet(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    memoryStorage[key] = value;
+    console.warn('localStorage set edilemedi, geçici bellek kullanılıyor:', e);
+  }
+}
+
+function storageGet(key) {
+  try {
+    const val = localStorage.getItem(key);
+    if (val !== null) return val;
+  } catch (e) {
+    console.warn('localStorage get edilemedi, geçici bellek kullanılıyor:', e);
+  }
+  return memoryStorage[key] || null;
+}
+
+function storageRemove(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (e) {
+    console.warn('localStorage remove edilemedi, geçici bellek temizleniyor:', e);
+  }
+  delete memoryStorage[key];
+}
+
 function stateKaydet() {
   try {
     const s = stateTopla();
-    localStorage.setItem(LS_KEY, JSON.stringify(s));
+    storageSet(LS_KEY, JSON.stringify(s));
   } catch (e) {
     console.warn('Kaydetme hatası:', e);
   }
@@ -584,7 +614,7 @@ function stateKaydet() {
 
 function stateYukle() {
   try {
-    const raw = localStorage.getItem(LS_KEY);
+    const raw = storageGet(LS_KEY);
     if (!raw) return;
     const s = JSON.parse(raw);
     stateUygula(s);
@@ -594,7 +624,7 @@ function stateYukle() {
 }
 
 function yeniOyunSifirla() {
-  localStorage.removeItem(LS_KEY);
+  storageRemove(LS_KEY);
   location.reload();
 }
 
