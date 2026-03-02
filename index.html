@@ -125,7 +125,9 @@
         </div>
         <div class="kategori ceza-kat">
           <h4>Cezalar</h4>
-          <div class="masa-btn">Masa Sayısı</div>
+          ${mode === 'team'
+            ? '<div class="ceza-satiri masa-satiri">Masa Sayısı: <button class="azalt">-</button><span class="masa-deger">0</span><button class="artir">+</button></div>'
+            : '<div class="masa-btn">Masa Sayısı</div>'}
           ${CEZA_LIST.map(c => `<div class="ceza-satiri">${c}: <button class="azalt">-</button><span>0</span><button class="artir">+</button></div>`).join('')}
         </div>`;
       return td;
@@ -183,11 +185,13 @@
     function getCellMarkState(cell) {
       const acmadi = cell.querySelector('[data-role="acmadi"].aktif');
       const bitti = cell.querySelector('[data-role="bitti"].aktif');
-      const masa = cell.querySelector('.masa-btn.aktif');
+      const masa = mode === 'team'
+        ? ((parseInt(cell.querySelector('.masa-deger')?.textContent || '0', 10) || 0) > 0)
+        : !!cell.querySelector('.masa-btn.aktif');
       const kalanInput = cell.querySelector('.kalan-input');
       const kalanVal = kalanInput?.value?.trim() || '';
       let cezaVar = false;
-      cell.querySelectorAll('.ceza-satiri span').forEach(sp => { if ((parseInt(sp.textContent || '0', 10) || 0) > 0) cezaVar = true; });
+      cell.querySelectorAll('.ceza-satiri:not(.masa-satiri) span').forEach(sp => { if ((parseInt(sp.textContent || '0', 10) || 0) > 0) cezaVar = true; });
       return Boolean(acmadi || bitti || masa || kalanVal || cezaVar);
     }
 
@@ -475,12 +479,14 @@
           const acmadi = cell.querySelector('[data-role="acmadi"].aktif');
           const bitti = cell.querySelector('[data-role="bitti"].aktif');
           const kalan = cell.querySelector('.kalan-input');
-          const masa = cell.querySelector('.masa-btn.aktif');
+          const masa = mode === 'team'
+        ? ((parseInt(cell.querySelector('.masa-deger')?.textContent || '0', 10) || 0) > 0)
+        : !!cell.querySelector('.masa-btn.aktif');
           const okey = cell.querySelector('.okey.aktif');
           const elden = cell.querySelector('.elden.aktif');
 
           let p = 0;
-          if (acmadi) p += 202;
+          if (acmadi) p += (mode === 'team' ? 404 : 202);
           else if (kalan?.value) p += parseInt(kalan.value, 10) || 0;
           else if (bitti) {
             if (okey && elden) p -= 202;
@@ -489,8 +495,9 @@
             else p -= 101;
           }
 
-          if (masa) p -= 101;
-          cell.querySelectorAll('.ceza-satiri span').forEach(sp => {
+          if (mode === 'team') p -= (parseInt(cell.querySelector('.masa-deger')?.textContent || '0', 10) || 0) * 101;
+          else if (masa) p -= 101;
+          cell.querySelectorAll('.ceza-satiri:not(.masa-satiri) span').forEach(sp => {
             p += (parseInt(sp.textContent || '0', 10) || 0) * 101;
           });
           hand[i] = p;
@@ -502,7 +509,7 @@
             let matePenalty = 0;
             const masa = cells[mate].querySelector('.masa-btn.aktif');
             if (masa) matePenalty -= 101;
-            cells[mate].querySelectorAll('.ceza-satiri span').forEach(sp => { matePenalty += (parseInt(sp.textContent || '0', 10) || 0) * 101; });
+            cells[mate].querySelectorAll('.ceza-satiri:not(.masa-satiri) span').forEach(sp => { matePenalty += (parseInt(sp.textContent || '0', 10) || 0) * 101; });
             hand[mate] = matePenalty;
           }
           cells.forEach((cell, i) => {
@@ -510,7 +517,19 @@
             const acmadi = cell.querySelector('[data-role="acmadi"].aktif');
             const kalan = cell.querySelector('.kalan-input');
             let extra = 0;
-            if (acmadi) extra = 202;
+            if (acmadi) extra = (mode === 'team' ? 404 : 202);
+            else if (kalan?.value) extra = parseInt(kalan.value, 10) || 0;
+            hand[i] += extra * (mult - 1);
+          });
+        }
+
+        if (mode === 'team' && bittiIndex !== null) {
+          cells.forEach((cell, i) => {
+            if (i === bittiIndex) return;
+            const acmadi = cell.querySelector('[data-role="acmadi"].aktif');
+            const kalan = cell.querySelector('.kalan-input');
+            let extra = 0;
+            if (acmadi) extra = 404;
             else if (kalan?.value) extra = parseInt(kalan.value, 10) || 0;
             hand[i] += extra * (mult - 1);
           });
@@ -542,13 +561,16 @@
       const names = Array.from(scoreTable.querySelectorAll('.name-input')).map(i => i.value || '');
       const rows = Array.from(scoreTable.querySelectorAll('tbody tr')).map(row => {
         return Array.from(row.querySelectorAll('.player-cell')).map(cell => {
-          const ceza = Array.from(cell.querySelectorAll('.ceza-satiri span')).map(s => parseInt(s.textContent || '0', 10) || 0);
+          const ceza = Array.from(cell.querySelectorAll('.ceza-satiri:not(.masa-satiri) span')).map(s => parseInt(s.textContent || '0', 10) || 0);
+          const masaCount = mode === 'team'
+            ? (parseInt(cell.querySelector('.masa-deger')?.textContent || '0', 10) || 0)
+            : (cell.querySelector('.masa-btn.aktif') ? 1 : 0);
           return {
             acmadi: !!cell.querySelector('[data-role="acmadi"].aktif'),
             bitti: !!cell.querySelector('[data-role="bitti"].aktif'),
             okey: !!cell.querySelector('.okey.aktif'),
             elden: !!cell.querySelector('.elden.aktif'),
-            masa: !!cell.querySelector('.masa-btn.aktif'),
+            masaCount,
             kalan: cell.querySelector('.kalan-input')?.value || '',
             ceza
           };
@@ -561,8 +583,14 @@
       clearCellAcma(cell);
 
       const masaBtn = cell.querySelector('.masa-btn');
-      if (masaBtn) masaBtn.classList.toggle('aktif', !!s.masa);
-      const spans = cell.querySelectorAll('.ceza-satiri span');
+      const masaCount = Math.max(0, Math.min(2, parseInt(String(s.masaCount ?? (s.masa ? 1 : 0)), 10) || 0));
+      if (mode === 'team') {
+        const masaDeger = cell.querySelector('.masa-deger');
+        if (masaDeger) masaDeger.textContent = String(masaCount);
+      } else if (masaBtn) {
+        masaBtn.classList.toggle('aktif', masaCount > 0);
+      }
+      const spans = cell.querySelectorAll('.ceza-satiri:not(.masa-satiri) span');
       s.ceza?.forEach((v, i) => { if (spans[i]) spans[i].textContent = String(v || 0); });
 
       const acmadiBtn = cell.querySelector('[data-role="acmadi"]');
@@ -679,6 +707,7 @@
         let v = parseInt(sp?.textContent || '0', 10) || 0;
         if (btn.classList.contains('artir')) v += 1;
         else v = Math.max(0, v - 1);
+        if (btn.closest('.masa-satiri')) v = Math.max(0, Math.min(2, v));
         if (sp) sp.textContent = String(v);
       }
 
