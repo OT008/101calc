@@ -328,6 +328,35 @@
       });
     }
 
+    function shouldHideBittiForCell(cell) {
+      const acmadiAktif = !!cell.querySelector('[data-role="acmadi"].aktif');
+      const kalanInput = cell.querySelector('.kalan-input');
+      const kalanDolu = !!(kalanInput && kalanInput.value.trim() !== '');
+      return acmadiAktif || kalanDolu;
+    }
+
+    function refreshBittiVisibility(row) {
+      if (!row) return;
+      const cells = Array.from(row.querySelectorAll('.player-cell'));
+      const activeBittiCell = cells.find(c => c.querySelector('[data-role="bitti"].aktif'));
+
+      cells.forEach(cell => {
+        const bittiBtn = cell.querySelector('[data-role="bitti"]');
+        if (!bittiBtn) return;
+        if (bittiBtn.classList.contains('aktif')) {
+          bittiBtn.style.display = 'inline-flex';
+          return;
+        }
+
+        if (activeBittiCell) {
+          bittiBtn.style.display = 'none';
+          return;
+        }
+
+        bittiBtn.style.display = shouldHideBittiForCell(cell) ? 'none' : 'inline-flex';
+      });
+    }
+
     function handleBitti(btn) {
       if (btn.classList.contains('pasif')) return;
       const cell = btn.closest('.player-cell');
@@ -503,6 +532,7 @@
 
     function afterAnyChange() {
       if (lastRowComplete()) addNewRow();
+      scoreTable.querySelectorAll('tbody tr').forEach(refreshBittiVisibility);
       applyRowLocks();
       calculateScores();
       saveState();
@@ -610,6 +640,7 @@
           });
         });
 
+        scoreTable.querySelectorAll('tbody tr').forEach(refreshBittiVisibility);
         applyRowLocks();
         calculateScores();
         return true;
@@ -624,6 +655,7 @@
       gameWrap.classList.remove('hidden');
       modeLabel.textContent = mode === 'player' ? 'Mod: Oyuncu Bazlı' : 'Mod: Takım Bazlı';
       buildTable();
+      scoreTable.querySelectorAll('tbody tr').forEach(refreshBittiVisibility);
       applyRowLocks();
       calculateScores();
       saveState();
