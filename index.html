@@ -225,9 +225,25 @@
       });
     }
 
+    function ensureKalanButton(cell) {
+      const acmaKat = cell.querySelector('.acma-kat');
+      if (!acmaKat) return null;
+      let kalanBtn = acmaKat.querySelector('[data-role="kalan"]');
+      if (kalanBtn) return kalanBtn;
+
+      kalanBtn = document.createElement('div');
+      kalanBtn.className = 'secenek';
+      kalanBtn.dataset.role = 'kalan';
+      kalanBtn.textContent = 'Kalan';
+      const bittiBtn = acmaKat.querySelector('[data-role="bitti"]');
+      if (bittiBtn) bittiBtn.insertAdjacentElement('beforebegin', kalanBtn);
+      else acmaKat.appendChild(kalanBtn);
+      return kalanBtn;
+    }
+
     function clearCellAcma(cell) {
       const acmadi = cell.querySelector('[data-role="acmadi"]');
-      const kalanBtn = cell.querySelector('[data-role="kalan"]');
+      const kalanBtn = ensureKalanButton(cell);
       const bitti = cell.querySelector('[data-role="bitti"]');
       const input = cell.querySelector('.kalan-input');
       const ekstra = cell.querySelector('.bitti-ekstra');
@@ -335,7 +351,7 @@
           const kalInput = cell.querySelector('.kalan-input');
           if (kalInput) kalInput.remove();
           const ac = cell.querySelector('[data-role="acmadi"]');
-          const ka = cell.querySelector('[data-role="kalan"]');
+          const ka = ensureKalanButton(cell);
           const bi = cell.querySelector('[data-role="bitti"]');
           if (ac) { ac.classList.remove('aktif'); ac.style.display = 'inline-flex'; }
           if (ka) ka.style.display = 'inline-flex';
@@ -348,13 +364,33 @@
 
     function applyTotalsHighlight(totals) {
       const mainTds = Array.from(scoreTable.querySelectorAll('tfoot .totals-main td')).slice(1);
+      const teamTds = Array.from(scoreTable.querySelectorAll('tfoot .totals-team td'));
+
       mainTds.forEach(td => td.classList.remove('total-high', 'total-low'));
+      teamTds.forEach(td => td.classList.remove('total-high', 'total-low'));
+
+      if (mode === 'player') {
+        if (teamTds.length < 3 || totals.length < 4) return;
+        const t1 = totals[0] + totals[1];
+        const t2 = totals[2] + totals[3];
+        if (t1 === t2) return;
+        if (t1 > t2) {
+          teamTds[1].classList.add('total-high');
+          teamTds[2].classList.add('total-low');
+        } else {
+          teamTds[2].classList.add('total-high');
+          teamTds[1].classList.add('total-low');
+        }
+        return;
+      }
+
       if (!mainTds.length || !totals.length) return;
       const max = Math.max(...totals);
       const min = Math.min(...totals);
+      if (max === min) return;
       mainTds.forEach((td, i) => {
-        if (totals[i] === max && max !== min) td.classList.add('total-high');
-        if (totals[i] === min && max !== min) td.classList.add('total-low');
+        if (totals[i] === max) td.classList.add('total-high');
+        if (totals[i] === min) td.classList.add('total-low');
       });
     }
 
