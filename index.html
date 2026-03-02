@@ -68,12 +68,14 @@
       <div class="mode-actions">
         <button id="btnOyuncu" class="btn-primary">Oyuncu Bazlı</button>
         <button id="btnTakim" class="btn-primary">Takım Bazlı</button>
+        <button id="btnLoadCode" class="btn-primary">Oyun Yükle</button>
       </div>
     </div>
 
     <div id="gameWrap" class="hidden">
       <div class="toolbar">
         <div class="mode-label" id="modeLabel"></div>
+        <button id="btnSaveCode" class="btn-primary" style="background:#27ae60;">Kodu Kaydet</button>
         <button id="btnYeniOyun" class="btn-danger">Yeni Oyun</button>
       </div>
       <table id="scoreTable"></table>
@@ -82,9 +84,10 @@
 
   <script>
     const LS_KEY = 'okey101_state_v3';
-    const CEZA_LIST = ['İşlek', 'Hatalı Açma', 'Okey Kaptırma'];
+    const CEZA_LIST = ['İşlek Atma', 'Hatalı Açma', 'Okey Kaptırma'];
     const memoryStorage = {};
     let mode = null; // player | team
+    let readOnlyLoadedGame = false;
 
     const modeWrap = document.getElementById('modeWrap');
     const gameWrap = document.getElementById('gameWrap');
@@ -124,7 +127,7 @@
           <div class="secenek" data-role="bitti">Bitti</div>
         </div>
         <div class="kategori ceza-kat">
-          <h4>Cezalar</h4>
+          <h4>Olaylar</h4>
           ${mode === 'team'
             ? '<div class="ceza-satiri masa-satiri">Masa Sayısı: <button class="azalt">-</button><span class="masa-deger">0</span><button class="artir">+</button></div>'
             : '<div class="masa-btn">Masa Sayısı</div>'}
@@ -314,7 +317,7 @@
       input.type = 'number';
       input.className = 'kalan-input';
       input.min = '1';
-      input.max = '252';
+      input.max = String(mode === 'team' ? 404 : 202);
       input.placeholder = '0';
       btn.replaceWith(input);
       input.focus();
@@ -326,7 +329,7 @@
           if (acmadi) acmadi.style.display = 'inline-flex';
           if (bitti) bitti.style.display = 'inline-flex';
         } else {
-          input.value = String(Math.min(252, v));
+          input.value = String(Math.min(mode === 'team' ? 404 : 202, v));
         }
         afterAnyChange();
       });
@@ -612,7 +615,7 @@
         input.type = 'number';
         input.className = 'kalan-input';
         input.min = '1';
-        input.max = '252';
+        input.max = String(mode === 'team' ? 404 : 202);
         input.placeholder = '0';
         input.value = String(s.kalan);
         kalanBtn.replaceWith(input);
@@ -623,7 +626,7 @@
             if (acmadiBtn) acmadiBtn.style.display = 'inline-flex';
             if (bittiBtn) bittiBtn.style.display = 'inline-flex';
           } else {
-            input.value = String(Math.min(252, v));
+            input.value = String(Math.min(mode === 'team' ? 404 : 202, v));
           }
           afterAnyChange();
         });
@@ -642,8 +645,50 @@
       }
     }
 
+    function encodeStateToCode(state) {
+      return btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+    }
+
+    function decodeStateFromCode(code) {
+      return JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+    }
+
+    function applyReadOnlyMode() {
+      const root = document.getElementById('gameWrap');
+      root.classList.add('read-only');
+      scoreTable.querySelectorAll('.secenek, .masa-btn, .artir, .azalt, .kalan-input').forEach(el => {
+        el.classList.add('pasif');
+      });
+      scoreTable.querySelectorAll('.name-input, .kalan-input').forEach(inp => {
+        inp.readOnly = true;
+        inp.disabled = true;
+      });
+    }
+
+    function renderState(state, locked = false) {
+      mode = state.mode;
+      readOnlyLoadedGame = locked;
+      modeWrap.classList.add('hidden');
+      gameWrap.classList.remove('hidden');
+      modeLabel.textContent = mode === 'player' ? 'Mod: Oyuncu Bazlı' : 'Mod: Takım Bazlı';
+      buildTable({ names: state.names || [], rowCount: state.rows?.length || 1 });
+
+      const domRows = scoreTable.querySelectorAll('tbody tr');
+      (state.rows || []).forEach((rowState, rIdx) => {
+        const domCells = domRows[rIdx]?.querySelectorAll('.player-cell') || [];
+        rowState.forEach((cellState, cIdx) => {
+          if (domCells[cIdx]) applyCellState(domCells[cIdx], cellState);
+        });
+      });
+
+      scoreTable.querySelectorAll('tbody tr').forEach(refreshBittiVisibility);
+      applyRowLocks();
+      calculateScores();
+      if (readOnlyLoadedGame) applyReadOnlyMode();
+    }
+
     function saveState() {
-      if (!mode) return;
+      if (!mode || readOnlyLoadedGame) return;
       storageSet(LS_KEY, JSON.stringify(serializeState()));
     }
 
@@ -653,24 +698,7 @@
       try {
         const s = JSON.parse(raw);
         if (!s?.mode || !Array.isArray(s.rows)) return false;
-        mode = s.mode;
-        modeWrap.classList.add('hidden');
-        gameWrap.classList.remove('hidden');
-        modeLabel.textContent = mode === 'player' ? 'Mod: Oyuncu Bazlı' : 'Mod: Takım Bazlı';
-
-        buildTable({ names: s.names || [], rowCount: s.rows.length || 1 });
-
-        const domRows = scoreTable.querySelectorAll('tbody tr');
-        s.rows.forEach((rowState, rIdx) => {
-          const domCells = domRows[rIdx]?.querySelectorAll('.player-cell') || [];
-          rowState.forEach((cellState, cIdx) => {
-            if (domCells[cIdx]) applyCellState(domCells[cIdx], cellState);
-          });
-        });
-
-        scoreTable.querySelectorAll('tbody tr').forEach(refreshBittiVisibility);
-        applyRowLocks();
-        calculateScores();
+        renderState(s, false);
         return true;
       } catch {
         return false;
@@ -679,6 +707,7 @@
 
     function startGame(selectedMode) {
       mode = selectedMode;
+      readOnlyLoadedGame = false;
       modeWrap.classList.add('hidden');
       gameWrap.classList.remove('hidden');
       modeLabel.textContent = mode === 'player' ? 'Mod: Oyuncu Bazlı' : 'Mod: Takım Bazlı';
@@ -691,7 +720,7 @@
 
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.secenek, .masa-btn, .artir, .azalt');
-      if (!btn || btn.classList.contains('pasif')) return;
+      if (!btn || btn.classList.contains('pasif') || readOnlyLoadedGame) return;
 
       if (btn.dataset.role === 'acmadi') handleAcmadi(btn);
       else if (btn.dataset.role === 'kalan') handleKalan(btn);
@@ -715,13 +744,31 @@
     });
 
     document.addEventListener('input', (e) => {
+      if (readOnlyLoadedGame) return;
       if (e.target.classList.contains('name-input') || e.target.classList.contains('kalan-input')) afterAnyChange();
     });
 
     document.getElementById('btnOyuncu').addEventListener('click', () => startGame('player'));
     document.getElementById('btnTakim').addEventListener('click', () => startGame('team'));
+    document.getElementById('btnLoadCode').addEventListener('click', () => {
+      const code = prompt('Yüklenecek oyun kodunu girin:');
+      if (!code) return;
+      try {
+        const state = decodeStateFromCode(code);
+        if (!state?.mode || !Array.isArray(state.rows)) throw new Error('invalid');
+        renderState(state, true);
+      } catch {
+        alert('Geçersiz kod.');
+      }
+    });
+    document.getElementById('btnSaveCode').addEventListener('click', () => {
+      if (!mode) return;
+      const code = encodeStateToCode(serializeState());
+      prompt('Bu kodu kopyalayıp saklayın:', code);
+    });
     document.getElementById('btnYeniOyun').addEventListener('click', () => {
       storageRemove(LS_KEY);
+      readOnlyLoadedGame = false;
       location.reload();
     });
 
