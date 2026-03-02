@@ -191,12 +191,37 @@
       return Boolean(acmadi || bitti || masa || kalanVal || cezaVar);
     }
 
+    function getMateIndex(i) {
+      if (mode !== 'player') return -1;
+      if (i === 0) return 1;
+      if (i === 1) return 0;
+      if (i === 2) return 3;
+      if (i === 3) return 2;
+      return -1;
+    }
+
+    function cellSayildiMi(row, idx) {
+      const cells = Array.from(row.querySelectorAll('.player-cell'));
+      const cell = cells[idx];
+      if (!cell) return false;
+      if (getCellMarkState(cell)) return true;
+
+      if (mode === 'player') {
+        const mateIdx = getMateIndex(idx);
+        if (mateIdx >= 0) {
+          const mateCell = cells[mateIdx];
+          if (mateCell?.querySelector('[data-role="bitti"].aktif')) return true;
+        }
+      }
+      return false;
+    }
+
     function lastRowComplete() {
       const rows = scoreTable.querySelectorAll('tbody tr');
       const last = rows[rows.length - 1];
       if (!last) return false;
       const cells = last.querySelectorAll('.player-cell');
-      return Array.from(cells).every(getCellMarkState);
+      return Array.from(cells).every((_, i) => cellSayildiMi(last, i));
     }
 
     function addNewRow() {
@@ -225,9 +250,25 @@
       });
     }
 
+    function ensureKalanButton(cell) {
+      const acmaKat = cell.querySelector('.acma-kat');
+      if (!acmaKat) return null;
+      let kalanBtn = acmaKat.querySelector('[data-role="kalan"]');
+      if (kalanBtn) return kalanBtn;
+
+      kalanBtn = document.createElement('div');
+      kalanBtn.className = 'secenek';
+      kalanBtn.dataset.role = 'kalan';
+      kalanBtn.textContent = 'Kalan';
+      const bittiBtn = acmaKat.querySelector('[data-role="bitti"]');
+      if (bittiBtn) bittiBtn.insertAdjacentElement('beforebegin', kalanBtn);
+      else acmaKat.appendChild(kalanBtn);
+      return kalanBtn;
+    }
+
     function clearCellAcma(cell) {
       const acmadi = cell.querySelector('[data-role="acmadi"]');
-      const kalanBtn = cell.querySelector('[data-role="kalan"]');
+      const kalanBtn = ensureKalanButton(cell);
       const bitti = cell.querySelector('[data-role="bitti"]');
       const input = cell.querySelector('.kalan-input');
       const ekstra = cell.querySelector('.bitti-ekstra');
@@ -287,6 +328,35 @@
       });
     }
 
+    function shouldHideBittiForCell(cell) {
+      const acmadiAktif = !!cell.querySelector('[data-role="acmadi"].aktif');
+      const kalanInput = cell.querySelector('.kalan-input');
+      const kalanDolu = !!(kalanInput && kalanInput.value.trim() !== '');
+      return acmadiAktif || kalanDolu;
+    }
+
+    function refreshBittiVisibility(row) {
+      if (!row) return;
+      const cells = Array.from(row.querySelectorAll('.player-cell'));
+      const activeBittiCell = cells.find(c => c.querySelector('[data-role="bitti"].aktif'));
+
+      cells.forEach(cell => {
+        const bittiBtn = cell.querySelector('[data-role="bitti"]');
+        if (!bittiBtn) return;
+        if (bittiBtn.classList.contains('aktif')) {
+          bittiBtn.style.display = 'inline-flex';
+          return;
+        }
+
+        if (activeBittiCell) {
+          bittiBtn.style.display = 'none';
+          return;
+        }
+
+        bittiBtn.style.display = shouldHideBittiForCell(cell) ? 'none' : 'inline-flex';
+      });
+    }
+
     function handleBitti(btn) {
       if (btn.classList.contains('pasif')) return;
       const cell = btn.closest('.player-cell');
@@ -335,7 +405,7 @@
           const kalInput = cell.querySelector('.kalan-input');
           if (kalInput) kalInput.remove();
           const ac = cell.querySelector('[data-role="acmadi"]');
-          const ka = cell.querySelector('[data-role="kalan"]');
+          const ka = ensureKalanButton(cell);
           const bi = cell.querySelector('[data-role="bitti"]');
           if (ac) { ac.classList.remove('aktif'); ac.style.display = 'inline-flex'; }
           if (ka) ka.style.display = 'inline-flex';
@@ -348,13 +418,33 @@
 
     function applyTotalsHighlight(totals) {
       const mainTds = Array.from(scoreTable.querySelectorAll('tfoot .totals-main td')).slice(1);
+      const teamTds = Array.from(scoreTable.querySelectorAll('tfoot .totals-team td'));
+
       mainTds.forEach(td => td.classList.remove('total-high', 'total-low'));
+      teamTds.forEach(td => td.classList.remove('total-high', 'total-low'));
+
+      if (mode === 'player') {
+        if (teamTds.length < 3 || totals.length < 4) return;
+        const t1 = totals[0] + totals[1];
+        const t2 = totals[2] + totals[3];
+        if (t1 === t2) return;
+        if (t1 > t2) {
+          teamTds[1].classList.add('total-high');
+          teamTds[2].classList.add('total-low');
+        } else {
+          teamTds[2].classList.add('total-high');
+          teamTds[1].classList.add('total-low');
+        }
+        return;
+      }
+
       if (!mainTds.length || !totals.length) return;
       const max = Math.max(...totals);
       const min = Math.min(...totals);
+      if (max === min) return;
       mainTds.forEach((td, i) => {
-        if (totals[i] === max && max !== min) td.classList.add('total-high');
-        if (totals[i] === min && max !== min) td.classList.add('total-low');
+        if (totals[i] === max) td.classList.add('total-high');
+        if (totals[i] === min) td.classList.add('total-low');
       });
     }
 
@@ -442,6 +532,7 @@
 
     function afterAnyChange() {
       if (lastRowComplete()) addNewRow();
+      scoreTable.querySelectorAll('tbody tr').forEach(refreshBittiVisibility);
       applyRowLocks();
       calculateScores();
       saveState();
@@ -549,6 +640,7 @@
           });
         });
 
+        scoreTable.querySelectorAll('tbody tr').forEach(refreshBittiVisibility);
         applyRowLocks();
         calculateScores();
         return true;
@@ -563,6 +655,7 @@
       gameWrap.classList.remove('hidden');
       modeLabel.textContent = mode === 'player' ? 'Mod: Oyuncu Bazlı' : 'Mod: Takım Bazlı';
       buildTable();
+      scoreTable.querySelectorAll('tbody tr').forEach(refreshBittiVisibility);
       applyRowLocks();
       calculateScores();
       saveState();
