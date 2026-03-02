@@ -57,6 +57,8 @@
     tfoot td { background: #eef4ff; font-weight: 700; font-size: 15px; border-top: 2px solid #4a90e2; }
     tfoot td:first-child { background: #4a90e2; color: #fff; }
     .team-total-label { background: #6c7a89 !important; color: #fff; }
+    .total-high { background: #e74c3c !important; color: #fff !important; }
+    .total-low { background: #2ecc71 !important; color: #fff !important; }
   </style>
 </head>
 <body>
@@ -89,9 +91,27 @@
     const modeLabel = document.getElementById('modeLabel');
     const scoreTable = document.getElementById('scoreTable');
 
-    function storageSet(key, value) { try { localStorage.setItem(key, value); } catch { memoryStorage[key] = value; } }
-    function storageGet(key) { try { const v = localStorage.getItem(key); return v !== null ? v : (memoryStorage[key] || null); } catch { return memoryStorage[key] || null; } }
-    function storageRemove(key) { try { localStorage.removeItem(key); } catch {} delete memoryStorage[key]; }
+    function storageSet(key, value) {
+      try { localStorage.setItem(key, value); return; } catch {}
+      try { sessionStorage.setItem(key, value); return; } catch {}
+      memoryStorage[key] = value;
+    }
+    function storageGet(key) {
+      try {
+        const v = localStorage.getItem(key);
+        if (v !== null) return v;
+      } catch {}
+      try {
+        const v = sessionStorage.getItem(key);
+        if (v !== null) return v;
+      } catch {}
+      return memoryStorage[key] || null;
+    }
+    function storageRemove(key) {
+      try { localStorage.removeItem(key); } catch {}
+      try { sessionStorage.removeItem(key); } catch {}
+      delete memoryStorage[key];
+    }
 
     function createCell() {
       const td = document.createElement('td');
@@ -301,12 +321,50 @@
       }
     }
 
+    function applyPlayerMateVisibility(row) {
+      if (mode !== 'player') return;
+      const cells = Array.from(row.querySelectorAll('.player-cell'));
+      if (cells.length !== 4) return;
+
+      const bitenIndex = cells.findIndex(c => c.querySelector('[data-role="bitti"].aktif'));
+      cells.forEach((cell, idx) => {
+        const acmaKat = cell.querySelector('.acma-kat');
+        if (!acmaKat) return;
+        if (bitenIndex !== -1 && (idx === ((bitenIndex % 2 === 0) ? bitenIndex + 1 : bitenIndex - 1))) {
+          acmaKat.style.display = 'none';
+          const kalInput = cell.querySelector('.kalan-input');
+          if (kalInput) kalInput.remove();
+          const ac = cell.querySelector('[data-role="acmadi"]');
+          const ka = cell.querySelector('[data-role="kalan"]');
+          const bi = cell.querySelector('[data-role="bitti"]');
+          if (ac) { ac.classList.remove('aktif'); ac.style.display = 'inline-flex'; }
+          if (ka) ka.style.display = 'inline-flex';
+          if (bi) { bi.classList.remove('aktif'); bi.style.display = 'inline-flex'; }
+        } else {
+          acmaKat.style.display = 'block';
+        }
+      });
+    }
+
+    function applyTotalsHighlight(totals) {
+      const mainTds = Array.from(scoreTable.querySelectorAll('tfoot .totals-main td')).slice(1);
+      mainTds.forEach(td => td.classList.remove('total-high', 'total-low'));
+      if (!mainTds.length || !totals.length) return;
+      const max = Math.max(...totals);
+      const min = Math.min(...totals);
+      mainTds.forEach((td, i) => {
+        if (totals[i] === max && max !== min) td.classList.add('total-high');
+        if (totals[i] === min && max !== min) td.classList.add('total-low');
+      });
+    }
+
     function calculateScores() {
       const rows = Array.from(scoreTable.querySelectorAll('tbody tr'));
       const colCount = mode === 'player' ? 4 : 2;
       const totals = Array(colCount).fill(0);
 
       rows.forEach(row => {
+        applyPlayerMateVisibility(row);
         const cells = Array.from(row.querySelectorAll('.player-cell'));
         const hand = Array(colCount).fill(0);
         let bittiIndex = null;
@@ -373,6 +431,7 @@
 
       const mainTds = scoreTable.querySelectorAll('tfoot .totals-main td');
       totals.forEach((v, i) => { if (mainTds[i + 1]) mainTds[i + 1].textContent = String(v); });
+      applyTotalsHighlight(totals);
 
       if (mode === 'player') {
         const teamTds = scoreTable.querySelectorAll('tfoot .totals-team td');
@@ -409,23 +468,58 @@
 
     function applyCellState(cell, s) {
       clearCellAcma(cell);
-      cell.querySelector('.masa-btn')?.classList.toggle('aktif', !!s.masa);
+
+      const masaBtn = cell.querySelector('.masa-btn');
+      if (masaBtn) masaBtn.classList.toggle('aktif', !!s.masa);
       const spans = cell.querySelectorAll('.ceza-satiri span');
       s.ceza?.forEach((v, i) => { if (spans[i]) spans[i].textContent = String(v || 0); });
 
-      if (s.acmadi) {
-        handleAcmadi(cell.querySelector('[data-role="acmadi"]'));
-      } else if (s.kalan) {
-        const kb = cell.querySelector('[data-role="kalan"]');
-        if (kb) {
-          handleKalan(kb);
-          const inp = cell.querySelector('.kalan-input');
-          if (inp) inp.value = String(s.kalan);
-        }
-      } else if (s.bitti) {
-        handleBitti(cell.querySelector('[data-role="bitti"]'));
-        cell.querySelector('.okey')?.classList.toggle('aktif', !!s.okey);
-        cell.querySelector('.elden')?.classList.toggle('aktif', !!s.elden);
+      const acmadiBtn = cell.querySelector('[data-role="acmadi"]');
+      const kalanBtn = cell.querySelector('[data-role="kalan"]');
+      const bittiBtn = cell.querySelector('[data-role="bitti"]');
+
+      if (s.acmadi && acmadiBtn) {
+        acmadiBtn.classList.add('aktif');
+        if (kalanBtn) kalanBtn.style.display = 'none';
+        if (bittiBtn) bittiBtn.style.display = 'none';
+        if (masaBtn) masaBtn.style.display = 'none';
+        return;
+      }
+
+      if (s.kalan && kalanBtn) {
+        if (acmadiBtn) acmadiBtn.style.display = 'none';
+        if (bittiBtn) bittiBtn.style.display = 'none';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.className = 'kalan-input';
+        input.min = '1';
+        input.max = '252';
+        input.placeholder = '0';
+        input.value = String(s.kalan);
+        kalanBtn.replaceWith(input);
+        input.addEventListener('blur', () => {
+          const v = parseInt(input.value || '0', 10) || 0;
+          if (v < 1) {
+            input.replaceWith(kalanBtn);
+            if (acmadiBtn) acmadiBtn.style.display = 'inline-flex';
+            if (bittiBtn) bittiBtn.style.display = 'inline-flex';
+          } else {
+            input.value = String(Math.min(252, v));
+          }
+          afterAnyChange();
+        });
+        return;
+      }
+
+      if (s.bitti && bittiBtn) {
+        bittiBtn.classList.add('aktif');
+        if (acmadiBtn) acmadiBtn.style.display = 'none';
+        if (kalanBtn) kalanBtn.style.display = 'none';
+        const ex = document.createElement('div');
+        ex.className = 'bitti-ekstra';
+        ex.style.marginTop = '6px';
+        ex.innerHTML = `<div class="secenek okey ${s.okey ? 'aktif' : ''}">Okey ile</div><div class="secenek elden ${s.elden ? 'aktif' : ''}">Elden</div>`;
+        cell.querySelector('.acma-kat')?.insertAdjacentElement('afterend', ex);
       }
     }
 
@@ -480,7 +574,11 @@
 
       if (btn.dataset.role === 'acmadi') handleAcmadi(btn);
       else if (btn.dataset.role === 'kalan') handleKalan(btn);
-      else if (btn.dataset.role === 'bitti') handleBitti(btn);
+      else if (btn.dataset.role === 'bitti') {
+        handleBitti(btn);
+        const row = btn.closest('tr');
+        if (row) applyPlayerMateVisibility(row);
+      }
       else if (btn.classList.contains('okey') || btn.classList.contains('elden')) btn.classList.toggle('aktif');
       else if (btn.classList.contains('masa-btn')) btn.classList.toggle('aktif');
       else if (btn.classList.contains('artir') || btn.classList.contains('azalt')) {
