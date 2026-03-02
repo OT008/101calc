@@ -191,12 +191,37 @@
       return Boolean(acmadi || bitti || masa || kalanVal || cezaVar);
     }
 
+    function getMateIndex(i) {
+      if (mode !== 'player') return -1;
+      if (i === 0) return 1;
+      if (i === 1) return 0;
+      if (i === 2) return 3;
+      if (i === 3) return 2;
+      return -1;
+    }
+
+    function cellSayildiMi(row, idx) {
+      const cells = Array.from(row.querySelectorAll('.player-cell'));
+      const cell = cells[idx];
+      if (!cell) return false;
+      if (getCellMarkState(cell)) return true;
+
+      if (mode === 'player') {
+        const mateIdx = getMateIndex(idx);
+        if (mateIdx >= 0) {
+          const mateCell = cells[mateIdx];
+          if (mateCell?.querySelector('[data-role="bitti"].aktif')) return true;
+        }
+      }
+      return false;
+    }
+
     function lastRowComplete() {
       const rows = scoreTable.querySelectorAll('tbody tr');
       const last = rows[rows.length - 1];
       if (!last) return false;
       const cells = last.querySelectorAll('.player-cell');
-      return Array.from(cells).every(getCellMarkState);
+      return Array.from(cells).every((_, i) => cellSayildiMi(last, i));
     }
 
     function addNewRow() {
