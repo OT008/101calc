@@ -61,14 +61,12 @@
     .total-high { background: #e74c3c !important; color: #fff !important; }
     .total-low { background: #2ecc71 !important; color: #fff !important; }
 
-    .totals-team { position: relative; }
     .team-score { position: relative; }
-    .team-diff-badge {
+    .diff-badge {
       position: absolute;
-      left: 50%;
       top: 50%;
-      transform: translate(-50%, -50%);
-      background: #34495e;
+      transform: translateY(-50%);
+      background: #e74c3c;
       color: #fff;
       padding: 4px 10px;
       border-radius: 999px;
@@ -78,6 +76,8 @@
       z-index: 2;
       white-space: nowrap;
     }
+    .diff-badge.left-side { left: 6px; }
+    .diff-badge.right-side { right: 6px; }
 
     @media (max-width: 768px) {
       body { padding: 10px; }
@@ -88,7 +88,7 @@
       .toolbar { padding: 10px; }
       .toolbar .mode-label { width: 100%; text-align: center; }
       table { min-width: 760px; }
-      .team-diff-badge { font-size: 11px; padding: 3px 8px; }
+      .diff-badge { font-size: 11px; padding: 3px 8px; }
     }
 
   </style>
@@ -100,14 +100,16 @@
       <div class="mode-actions">
         <button id="btnOyuncu" class="btn-primary">Oyuncu Bazlı</button>
         <button id="btnTakim" class="btn-primary">Takım Bazlı</button>
-        <button id="btnLoadCode" class="btn-primary">Oyun Yükle</button>
+        <button id="btnLoadCode" class="btn-primary">Dosyadan Yükle</button>
       </div>
     </div>
+
+    <input type="file" id="fileLoader" accept="application/json,.json,text/plain" class="hidden">
 
     <div id="gameWrap" class="hidden">
       <div class="toolbar">
         <div class="mode-label" id="modeLabel"></div>
-        <button id="btnSaveCode" class="btn-primary" style="background:#27ae60;">Kodu Kaydet</button>
+        <button id="btnSaveCode" class="btn-primary" style="background:#27ae60;">Dosya Kaydet</button>
         <button id="btnYeniOyun" class="btn-danger">Yeni Oyun</button>
       </div>
       <div class="table-scroll"><table id="scoreTable"></table></div>
@@ -211,7 +213,7 @@
       if (mode === 'player') {
         const teamRow = document.createElement('tr');
         teamRow.className = 'totals-team';
-        teamRow.innerHTML = '<td class="team-total-label">Takım Toplamı <span class="team-diff-badge">Fark: 0</span></td><td colspan="2" class="team-score team-score-a">0</td><td colspan="2" class="team-score team-score-b">0</td>';
+        teamRow.innerHTML = '<td class="team-total-label">Takım Toplamı</td><td colspan="2" class="team-score team-score-a">0</td><td colspan="2" class="team-score team-score-b">0</td>';
         tfoot.appendChild(teamRow);
       }
       scoreTable.appendChild(tfoot);
@@ -318,6 +320,20 @@
       if (ekstra) ekstra.remove();
     }
 
+    function resetMasaForCell(cell) {
+      if (mode === 'team') {
+        const masaDeger = cell.querySelector('.masa-deger');
+        if (masaDeger) masaDeger.textContent = '0';
+      } else {
+        const masaBtn = cell.querySelector('.masa-btn');
+        if (masaBtn) masaBtn.classList.remove('aktif');
+      }
+    }
+
+    function isAcmadiActive(cell) {
+      return !!cell.querySelector('[data-role="acmadi"].aktif');
+    }
+
     function handleAcmadi(btn) {
       if (btn.classList.contains('pasif')) return;
       const cell = btn.closest('.player-cell');
@@ -326,6 +342,7 @@
       const masa = cell.querySelector('.masa-btn');
       const active = btn.classList.toggle('aktif');
       if (active) {
+        resetMasaForCell(cell);
         const input = cell.querySelector('.kalan-input'); if (input) input.remove();
         if (kalan) kalan.style.display = 'none';
         if (bitti) bitti.style.display = 'none';
@@ -459,32 +476,55 @@
       const mainTds = Array.from(scoreTable.querySelectorAll('tfoot .totals-main td')).slice(1);
       const teamTds = Array.from(scoreTable.querySelectorAll('tfoot .totals-team td'));
 
-      mainTds.forEach(td => td.classList.remove('total-high', 'total-low'));
-      teamTds.forEach(td => td.classList.remove('total-high', 'total-low'));
+      mainTds.forEach(td => {
+        td.classList.remove('total-high', 'total-low');
+        td.querySelector('.diff-badge')?.remove();
+      });
+      teamTds.forEach(td => {
+        td.classList.remove('total-high', 'total-low');
+        td.querySelector('.diff-badge')?.remove();
+      });
+
+      const placeDiff = (td, text, side) => {
+        if (!td) return;
+        const b = document.createElement('span');
+        b.className = `diff-badge ${side}`;
+        b.textContent = text;
+        td.appendChild(b);
+      };
 
       if (mode === 'player') {
         if (teamTds.length < 3 || totals.length < 4) return;
         const t1 = totals[0] + totals[1];
         const t2 = totals[2] + totals[3];
+        const diff = Math.abs(t1 - t2);
         if (t1 === t2) return;
         if (t1 > t2) {
           teamTds[1].classList.add('total-high');
           teamTds[2].classList.add('total-low');
+          placeDiff(teamTds[1], `Fark: ${diff}`, 'right-side');
         } else {
           teamTds[2].classList.add('total-high');
           teamTds[1].classList.add('total-low');
+          placeDiff(teamTds[2], `Fark: ${diff}`, 'left-side');
         }
         return;
       }
 
-      if (!mainTds.length || !totals.length) return;
-      const max = Math.max(...totals);
-      const min = Math.min(...totals);
-      if (max === min) return;
-      mainTds.forEach((td, i) => {
-        if (totals[i] === max) td.classList.add('total-high');
-        if (totals[i] === min) td.classList.add('total-low');
-      });
+      if (!mainTds.length || totals.length < 2) return;
+      const t1 = totals[0];
+      const t2 = totals[1];
+      const diff = Math.abs(t1 - t2);
+      if (t1 === t2) return;
+      if (t1 > t2) {
+        mainTds[0].classList.add('total-high');
+        mainTds[1].classList.add('total-low');
+        placeDiff(mainTds[0], `Fark: ${diff}`, 'right-side');
+      } else {
+        mainTds[1].classList.add('total-high');
+        mainTds[0].classList.add('total-low');
+        placeDiff(mainTds[1], `Fark: ${diff}`, 'left-side');
+      }
     }
 
     function calculateScores() {
@@ -583,8 +623,6 @@
         const t2 = totals[2] + totals[3];
         teamTds[1].textContent = String(t1);
         teamTds[2].textContent = String(t2);
-        const diffEl = scoreTable.querySelector('tfoot .totals-team .team-diff-badge');
-        if (diffEl) diffEl.textContent = `Fark: ${Math.abs(t1 - t2)}`;
       }
     }
 
@@ -819,13 +857,20 @@
         if (row) applyPlayerMateVisibility(row);
       }
       else if (btn.classList.contains('okey') || btn.classList.contains('elden')) btn.classList.toggle('aktif');
-      else if (btn.classList.contains('masa-btn')) btn.classList.toggle('aktif');
+      else if (btn.classList.contains('masa-btn')) {
+        const cell = btn.closest('.player-cell');
+        if (cell && isAcmadiActive(cell)) return;
+        btn.classList.toggle('aktif');
+      }
       else if (btn.classList.contains('artir') || btn.classList.contains('azalt')) {
-        const sp = btn.closest('.ceza-satiri')?.querySelector('span');
+        const satir = btn.closest('.ceza-satiri');
+        const cell = btn.closest('.player-cell');
+        if (satir?.classList.contains('masa-satiri') && cell && isAcmadiActive(cell)) return;
+        const sp = satir?.querySelector('span');
         let v = parseInt(sp?.textContent || '0', 10) || 0;
         if (btn.classList.contains('artir')) v += 1;
         else v = Math.max(0, v - 1);
-        if (btn.closest('.masa-satiri')) v = Math.max(0, Math.min(2, v));
+        if (satir?.classList.contains('masa-satiri')) v = Math.max(0, Math.min(2, v));
         if (sp) sp.textContent = String(v);
       }
 
@@ -839,22 +884,41 @@
 
     document.getElementById('btnOyuncu').addEventListener('click', () => startGame('player'));
     document.getElementById('btnTakim').addEventListener('click', () => startGame('team'));
-    document.getElementById('btnLoadCode').addEventListener('click', async () => {
-      const code = prompt('Yüklenecek oyun kodunu girin:');
-      if (!code) return;
+    document.getElementById('btnLoadCode').addEventListener('click', () => {
+      document.getElementById('fileLoader').click();
+    });
+    document.getElementById('fileLoader').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
       try {
-        const state = await decodeStateFromCode(code);
+        const text = await file.text();
+        let state = null;
+        try {
+          state = JSON.parse(text);
+        } catch {
+          state = await decodeStateFromCode(text);
+        }
         if (!state?.mode || !Array.isArray(state.rows)) throw new Error('invalid');
         renderState(state, true);
       } catch {
-        alert('Geçersiz kod. Kodun tamamını kopyalayıp yapıştırdığınızdan emin olun.');
+        alert('Geçersiz dosya.');
+      } finally {
+        e.target.value = '';
       }
     });
     document.getElementById('btnSaveCode').addEventListener('click', async () => {
       if (!mode) return;
-      const code = await encodeStateToCode(serializeState());
-      try { await navigator.clipboard.writeText(code); } catch {}
-      prompt('Bu kodu kopyalayıp saklayın:', code);
+      const state = serializeState();
+      const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const ts = new Date().toISOString().replace(/[:.]/g, '-');
+      a.href = url;
+      a.download = `okey101-${state.mode}-${ts}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     });
     document.getElementById('btnYeniOyun').addEventListener('click', () => {
       storageRemove(LS_KEY);
