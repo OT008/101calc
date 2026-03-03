@@ -658,12 +658,65 @@
       }
     }
 
-    function encodeStateToCode(state) {
-      return btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+    function bytesToBase64(bytes) {
+      let bin = '';
+      const chunk = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunk) {
+        bin += String.fromCharCode(...bytes.subarray(i, i + chunk));
+      }
+      return btoa(bin);
     }
 
-    function decodeStateFromCode(code) {
-      return JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+    function base64ToBytes(base64) {
+      const bin = atob(base64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return bytes;
+    }
+
+    async function gzipCompress(bytes) {
+      if (typeof CompressionStream === 'undefined') return null;
+      const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'));
+      const out = await new Response(stream).arrayBuffer();
+      return new Uint8Array(out);
+    }
+
+    async function gzipDecompress(bytes) {
+      if (typeof DecompressionStream === 'undefined') throw new Error('desteklenmiyor');
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+      const out = await new Response(stream).arrayBuffer();
+      return new Uint8Array(out);
+    }
+
+    async function encodeStateToCode(state) {
+      const jsonBytes = new TextEncoder().encode(JSON.stringify(state));
+      const gz = await gzipCompress(jsonBytes);
+      if (gz) return `G1:${bytesToBase64(gz)}`;
+      return `J1:${bytesToBase64(jsonBytes)}`;
+    }
+
+    async function decodeStateFromCode(code) {
+      const raw = code.trim();
+      if (!raw) throw new Error('boş kod');
+
+      if (raw.startsWith('G1:')) {
+        const zipped = base64ToBytes(raw.slice(3));
+        const bytes = await gzipDecompress(zipped);
+        return JSON.parse(new TextDecoder().decode(bytes));
+      }
+
+      if (raw.startsWith('J1:')) {
+        const bytes = base64ToBytes(raw.slice(3));
+        return JSON.parse(new TextDecoder().decode(bytes));
+      }
+
+      // Geriye dönük uyumluluk: eski format
+      try {
+        return JSON.parse(decodeURIComponent(escape(atob(raw))));
+      } catch {
+        const bytes = base64ToBytes(raw);
+        return JSON.parse(new TextDecoder().decode(bytes));
+      }
     }
 
     function applyReadOnlyMode() {
@@ -763,20 +816,21 @@
 
     document.getElementById('btnOyuncu').addEventListener('click', () => startGame('player'));
     document.getElementById('btnTakim').addEventListener('click', () => startGame('team'));
-    document.getElementById('btnLoadCode').addEventListener('click', () => {
+    document.getElementById('btnLoadCode').addEventListener('click', async () => {
       const code = prompt('Yüklenecek oyun kodunu girin:');
       if (!code) return;
       try {
-        const state = decodeStateFromCode(code);
+        const state = await decodeStateFromCode(code);
         if (!state?.mode || !Array.isArray(state.rows)) throw new Error('invalid');
         renderState(state, true);
       } catch {
-        alert('Geçersiz kod.');
+        alert('Geçersiz kod. Kodun tamamını kopyalayıp yapıştırdığınızdan emin olun.');
       }
     });
-    document.getElementById('btnSaveCode').addEventListener('click', () => {
+    document.getElementById('btnSaveCode').addEventListener('click', async () => {
       if (!mode) return;
-      const code = encodeStateToCode(serializeState());
+      const code = await encodeStateToCode(serializeState());
+      try { await navigator.clipboard.writeText(code); } catch {}
       prompt('Bu kodu kopyalayıp saklayın:', code);
     });
     document.getElementById('btnYeniOyun').addEventListener('click', () => {
