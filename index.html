@@ -61,6 +61,24 @@
     .total-high { background: #e74c3c !important; color: #fff !important; }
     .total-low { background: #2ecc71 !important; color: #fff !important; }
 
+    .totals-team { position: relative; }
+    .team-score { position: relative; }
+    .team-diff-badge {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: #34495e;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      pointer-events: none;
+      z-index: 2;
+      white-space: nowrap;
+    }
+
     @media (max-width: 768px) {
       body { padding: 10px; }
       .container { border-radius: 8px; }
@@ -70,6 +88,7 @@
       .toolbar { padding: 10px; }
       .toolbar .mode-label { width: 100%; text-align: center; }
       table { min-width: 760px; }
+      .team-diff-badge { font-size: 11px; padding: 3px 8px; }
     }
 
   </style>
@@ -192,7 +211,7 @@
       if (mode === 'player') {
         const teamRow = document.createElement('tr');
         teamRow.className = 'totals-team';
-        teamRow.innerHTML = '<td class="team-total-label">Takım Toplamı</td><td colspan="2">0</td><td colspan="2">0</td>';
+        teamRow.innerHTML = '<td class="team-total-label">Takım Toplamı <span class="team-diff-badge">Fark: 0</span></td><td colspan="2" class="team-score team-score-a">0</td><td colspan="2" class="team-score team-score-b">0</td>';
         tfoot.appendChild(teamRow);
       }
       scoreTable.appendChild(tfoot);
@@ -560,8 +579,12 @@
 
       if (mode === 'player') {
         const teamTds = scoreTable.querySelectorAll('tfoot .totals-team td');
-        teamTds[1].textContent = String(totals[0] + totals[1]);
-        teamTds[2].textContent = String(totals[2] + totals[3]);
+        const t1 = totals[0] + totals[1];
+        const t2 = totals[2] + totals[3];
+        teamTds[1].textContent = String(t1);
+        teamTds[2].textContent = String(t2);
+        const diffEl = scoreTable.querySelector('tfoot .totals-team .team-diff-badge');
+        if (diffEl) diffEl.textContent = `Fark: ${Math.abs(t1 - t2)}`;
       }
     }
 
