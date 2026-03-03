@@ -62,10 +62,10 @@
     .total-low { background: #2ecc71 !important; color: #fff !important; }
 
     .team-score { position: relative; }
+    .diff-anchor { position: relative; overflow: visible; }
     .diff-badge {
       position: absolute;
       top: 50%;
-      transform: translateY(-50%);
       background: #e74c3c;
       color: #fff;
       padding: 4px 10px;
@@ -73,11 +73,17 @@
       font-size: 12px;
       font-weight: 700;
       pointer-events: none;
-      z-index: 2;
+      z-index: 3;
       white-space: nowrap;
     }
-    .diff-badge.left-side { left: 6px; }
-    .diff-badge.right-side { right: 6px; }
+    .diff-badge.divider-left {
+      left: 0;
+      transform: translate(-50%, -50%);
+    }
+    .diff-badge.divider-right {
+      right: 0;
+      transform: translate(50%, -50%);
+    }
 
     @media (max-width: 768px) {
       body { padding: 10px; }
@@ -477,16 +483,17 @@
       const teamTds = Array.from(scoreTable.querySelectorAll('tfoot .totals-team td'));
 
       mainTds.forEach(td => {
-        td.classList.remove('total-high', 'total-low');
+        td.classList.remove('total-high', 'total-low', 'diff-anchor');
         td.querySelector('.diff-badge')?.remove();
       });
       teamTds.forEach(td => {
-        td.classList.remove('total-high', 'total-low');
+        td.classList.remove('total-high', 'total-low', 'diff-anchor');
         td.querySelector('.diff-badge')?.remove();
       });
 
       const placeDiff = (td, text, side) => {
         if (!td) return;
+        td.classList.add('diff-anchor');
         const b = document.createElement('span');
         b.className = `diff-badge ${side}`;
         b.textContent = text;
@@ -502,11 +509,11 @@
         if (t1 > t2) {
           teamTds[1].classList.add('total-high');
           teamTds[2].classList.add('total-low');
-          placeDiff(teamTds[1], `Fark: ${diff}`, 'right-side');
+          placeDiff(teamTds[1], `Fark: ${diff}`, 'divider-right');
         } else {
           teamTds[2].classList.add('total-high');
           teamTds[1].classList.add('total-low');
-          placeDiff(teamTds[2], `Fark: ${diff}`, 'left-side');
+          placeDiff(teamTds[2], `Fark: ${diff}`, 'divider-left');
         }
         return;
       }
@@ -519,11 +526,11 @@
       if (t1 > t2) {
         mainTds[0].classList.add('total-high');
         mainTds[1].classList.add('total-low');
-        placeDiff(mainTds[0], `Fark: ${diff}`, 'right-side');
+        placeDiff(mainTds[0], `Fark: ${diff}`, 'divider-right');
       } else {
         mainTds[1].classList.add('total-high');
         mainTds[0].classList.add('total-low');
-        placeDiff(mainTds[1], `Fark: ${diff}`, 'left-side');
+        placeDiff(mainTds[1], `Fark: ${diff}`, 'divider-left');
       }
     }
 
