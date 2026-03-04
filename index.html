@@ -622,7 +622,6 @@
 
       const mainTds = scoreTable.querySelectorAll('tfoot .totals-main td');
       totals.forEach((v, i) => { if (mainTds[i + 1]) mainTds[i + 1].textContent = String(v); });
-      applyTotalsHighlight(totals);
 
       if (mode === 'player') {
         const teamTds = scoreTable.querySelectorAll('tfoot .totals-team td');
@@ -631,6 +630,8 @@
         teamTds[1].textContent = String(t1);
         teamTds[2].textContent = String(t2);
       }
+
+      applyTotalsHighlight(totals);
     }
 
     function afterAnyChange() {
